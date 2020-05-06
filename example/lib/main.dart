@@ -33,7 +33,8 @@ Future<String> initAds() async {
         unityGameId: "3515411",
         appLovinSdkKey:
             "MwwhiwzfiNGzQHR005ynVW4i8kdnEzHVyb0XH1bePmmMlPMkeURbWZ2l8xQV6NvcVqlPwEuH730sVr68GJWWvg",
-        vungleAppId: "5ea85d0d1aeed60001704b3f");
+        vungleAppId: "5ea85d0d1aeed60001704b3f",
+        facebookEnabled: true);
   } else {
     moPubData = new MoPubData(
         bannerAdId: "0ac59b0996d947309c33f59d6676399f",
@@ -47,9 +48,10 @@ Future<String> initAds() async {
         unityGameId: "3515411",
         appLovinSdkKey:
             "MwwhiwzfiNGzQHR005ynVW4i8kdnEzHVyb0XH1bePmmMlPMkeURbWZ2l8xQV6NvcVqlPwEuH730sVr68GJWWvg",
-        vungleAppId: "5ea85d0d1aeed60001704b3f");
+        vungleAppId: "5ea85d0d1aeed60001704b3f",
+        facebookEnabled: true);
   }
-  return await MoPubAd.initialize(moPubData);
+  return await AdManager.initialize(moPubData);
 }
 
 class MyApp extends StatefulWidget {
@@ -60,11 +62,11 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
-    MoPubAd.startListening();
+    AdManager.startListening();
     super.initState();
-    MoPubAd.rewardEvents = ((RewardAdStatus status) {
+    AdManager.rewardEvents = ((RewardAdStatus status) {
       if (status == RewardAdStatus.completed) {
-        MoPubAd.precacheRewardAd();
+        AdManager.precacheRewardAd();
       }
     });
   }
@@ -101,22 +103,22 @@ class _MyAppState extends State<MyApp> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
                       getButton("showBannerAd", onPressed: () {
-                        MoPubAd.fetchAndLoadBanner();
+                        AdManager.fetchAndLoadBanner();
                       }),
                       getButton("hideBannerAd", onPressed: () {
-                        MoPubAd.hideBanner();
+                        AdManager.hideBanner();
                       }),
                       getButton("precacheInterstitialAd", onPressed: () {
-                        MoPubAd.precacheInterstitialAd();
+                        AdManager.precacheInterstitialAd();
                       }),
                       getButton("showInterstitialAd", onPressed: () {
-                        MoPubAd.showInterstitialAd();
+                        AdManager.showInterstitialAd();
                       }),
                       getButton("precacheRewardAd", onPressed: () {
-                        MoPubAd.precacheRewardAd();
+                        AdManager.precacheRewardAd();
                       }),
                       getButton("showRewardAd", onPressed: () {
-                        MoPubAd.showRewardAd();
+                        AdManager.showRewardAd();
                       }),
                       getButton("Nex Screen", onPressed: () {
                         Navigator.push(context,
@@ -137,4 +139,5 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+
 }

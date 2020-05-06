@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mopub/models/mopub_data.dart';
 
@@ -22,8 +23,10 @@ enum RewardAdStatus {
   closed
 }
 
-class MoPubAd {
+class AdManager {
   static var _methodChannel = MethodChannel('com.firekamp.mopub/method');
+
+  static AndroidView platformView = AndroidView(viewType: 'com.firekamp.mopub/banneradview');
 
   static Function(RewardAdStatus) rewardEvents;
   static Function(InterstitialAdStatus) interstitialEvents;
@@ -46,13 +49,12 @@ class MoPubAd {
   static Future<String> initialize(MoPubData data) async {
     try {
       var json = jsonEncode(data);
-      return await _methodChannel.invokeMethod('init', json);
+      return await _methodChannel.invokeMethod('configure', json);
     } on PlatformException catch (e) {
       print(e.message);
       return e.message;
     }
   }
-
 
   static void _updateRewardFromStream(statusValue) {
     var status = RewardAdStatus.values[statusValue];
@@ -90,12 +92,21 @@ class MoPubAd {
     }
   }
 
+  static showBanner()
+  {
+    try {
+      _methodChannel.invokeMethod('showBanner');
+    } on PlatformException catch (e) {
+      print("Error showing banner bridge ${e.message}");
+    }
+  }
+
   static hideBanner()
   {
     try {
       _methodChannel.invokeMethod('hideBanner');
     } on PlatformException catch (e) {
-      print("Error precaching interstitial from bridge ${e.message}");
+      print("Error hiding banner from bridge ${e.message}");
     }
   }
 
@@ -111,7 +122,7 @@ class MoPubAd {
     try {
       _methodChannel.invokeMethod('prefetchReward');
     } on PlatformException catch (e) {
-      print("Error precaching interstitial from bridge ${e.message}");
+      print("Error precaching reward from bridge ${e.message}");
     }
   }
 

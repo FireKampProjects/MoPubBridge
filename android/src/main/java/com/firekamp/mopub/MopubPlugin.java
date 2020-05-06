@@ -2,9 +2,10 @@ package com.firekamp.mopub;
 
 import android.app.Activity;
 import android.util.Log;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
+
+import com.facebook.ads.Ad;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,185 +19,192 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 /**
  * MopubPlugin
  */
 public class MopubPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware, EventChannel.StreamHandler {
 
-    public final static String TAG = "MoPub";
-    public final static String TAG_BANNER = "MoPubBanner";
+    final static String PLUGIN_TAG = "MoPubPlugin";
     static Activity activity;
-    static final String METHOD_CHANNEL = "com.firekamp.mopub/method";
-    static final String EVENT_INTERSTITIAL_CHANNEL = "com.firekamp.mopub/interstitial_stream";
-    static final String EVENT_REWARD_CHANNEL = "com.firekamp.mopub/reward_stream";
-    static final String VIEW_BANNER = "com.firekamp.mopub/banneradview";
-    static EventChannel.EventSink INTERSTITIAL_EVENTS;
-    static EventChannel.EventSink REWARD_EVENTS;
+
+    private static final String METHOD_CHANNEL = "com.firekamp.mopub/method";
+    private static final String EVENT_INTERSTITIAL_CHANNEL = "com.firekamp.mopub/interstitial_stream";
+    private static final String EVENT_REWARD_CHANNEL = "com.firekamp.mopub/reward_stream";
+    private static final String VIEW_BANNER = "com.firekamp.mopub/banneradview";
+
+    private EventChannel.EventSink INTERSTITIAL_EVENTS;
+    private EventChannel.EventSink REWARD_EVENTS;
+
+    private final AdManager adManager = AdManager.getInstance();
+
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-        final MethodChannel methodChannel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), METHOD_CHANNEL);
-        final EventChannel eventInterstitialChannel = new EventChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), EVENT_INTERSTITIAL_CHANNEL);
-        final EventChannel eventRewardChannel = new EventChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), EVENT_REWARD_CHANNEL);
+        final BinaryMessenger binaryMessenger = flutterPluginBinding.getBinaryMessenger();
+        final MethodChannel methodChannel = new MethodChannel(binaryMessenger, METHOD_CHANNEL);
+        final EventChannel eventInterstitialChannel = new EventChannel(binaryMessenger, EVENT_INTERSTITIAL_CHANNEL);
+        final EventChannel eventRewardChannel = new EventChannel(binaryMessenger, EVENT_REWARD_CHANNEL);
 
-        methodChannel.setMethodCallHandler(new MopubPlugin());
-        eventInterstitialChannel.setStreamHandler(new MopubPlugin());
-        eventRewardChannel.setStreamHandler(new MopubPlugin());
-        BinaryMessenger messenger = flutterPluginBinding.getBinaryMessenger();
-        flutterPluginBinding.getPlatformViewRegistry().registerViewFactory(VIEW_BANNER, new BannerAdViewFactory(messenger));
-
+        methodChannel.setMethodCallHandler(this);
+        eventInterstitialChannel.setStreamHandler(this);
+        eventRewardChannel.setStreamHandler(this);
+        flutterPluginBinding.getPlatformViewRegistry().registerViewFactory(VIEW_BANNER, new BannerAdViewFactory(binaryMessenger));
     }
-
-
-    public static void registerWith(Registrar registrar) {
-        activity = registrar.activity();
-        final MethodChannel channel = new MethodChannel(registrar.messenger(), METHOD_CHANNEL);
-        final EventChannel rewardChannel = new EventChannel(registrar.messenger(), EVENT_REWARD_CHANNEL);
-        final EventChannel interstitialChannel = new EventChannel(registrar.messenger(), EVENT_INTERSTITIAL_CHANNEL);
-
-        channel.setMethodCallHandler(new MopubPlugin());
-        interstitialChannel.setStreamHandler(new MopubPlugin());
-        rewardChannel.setStreamHandler(new MopubPlugin());
-
-        registrar
-                .platformViewRegistry()
-                .registerViewFactory(
-                        VIEW_BANNER, new BannerAdViewFactory(registrar.messenger()));
-
-    }
-
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         try {
-            if (call.method.equals("init")) {
-                configure(call, result);
-                initializeAdManagerAndListenToEvents();
-                return;
+            if (call.method.equals(BridgeMethods.configure)) {
+                final AdConfiguration configuration = fetchConfiguration(call);
+                configureAdManager(configuration);
+                result.success(null);
             }
-            if (AdIds.banner == null) {
-                result.error(null, "Not initialized. Please pass the data by MoPubAd.initialize(moPubData) ", null);
-                return;
-            }
-            if (call.method.equals(BridgeMethods.fetchAndLoadBanner)) {
-                AdManager.getInstance().fetchAndLoadBanner();
+            else if (call.method.equals(BridgeMethods.fetchAndLoadBanner)) {
+                adManager.fetchAndLoadBanner();
+                result.success(null);
+            } else if (call.method.equals(BridgeMethods.showBanner)) {
+                adManager.showBanner();
+                result.success(null);
             } else if (call.method.equals(BridgeMethods.hideBanner)) {
-                AdManager.getInstance().hideBanner();
+                adManager.hideBanner();
+                result.success(null);
             } else if (call.method.equals(BridgeMethods.prefetchInterstitial)) {
-                AdManager.getInstance().fetchInterstitial();
+                adManager.fetchInterstitial();
+                result.success(null);
             } else if (call.method.equals(BridgeMethods.prefetchReward)) {
-                AdManager.getInstance().fetchRewardVideo();
+                adManager.fetchRewardVideo();
+                result.success(null);
             } else if (call.method.equals(BridgeMethods.showInterstitialAd)) {
-                AdManager.getInstance().showInterstitial();
+                adManager.showInterstitial();
+                result.success(null);
             } else if (call.method.equals(BridgeMethods.showRewardAd)) {
-                AdManager.getInstance().showRewardVideo();
+                adManager.showRewardVideo();
+                result.success(null);
             } else {
                 result.notImplemented();
             }
         } catch (Exception e) {
             result.error(null, e.getMessage(), e);
-            Log.e(TAG, e.getMessage());
+            Log.e(PLUGIN_TAG, e.getMessage());
         }
     }
 
-    void configure(MethodCall method, Result result) throws JSONException {
-        JSONObject data = new JSONObject(method.arguments().toString());
+    AdConfiguration fetchConfiguration(MethodCall method) throws JSONException {
+        final JSONObject data = new JSONObject(method.arguments().toString());
+
+        String bannerAdId = null;
         if (data.has("bannerAdId")) {
-            AdIds.banner = data.get("bannerAdId").toString();
+            bannerAdId = data.get("bannerAdId").toString();
         }
+
+        String interstitialAdId = null;
         if (data.has("interstitialAdId")) {
-            AdIds.interstitial = data.get("interstitialAdId").toString();
+            interstitialAdId = data.get("interstitialAdId").toString();
         }
+
+        String rewardAdId = null;
         if (data.has("rewardAdId")) {
-            AdIds.reward = data.get("rewardAdId").toString();
+            rewardAdId = data.get("rewardAdId").toString();
         }
+
+        String vungleAppId = null;
         if (data.has("vungleAppId")) {
-            AdIds.vungleAppId = data.get("vungleAppId").toString();
+            vungleAppId = data.get("vungleAppId").toString();
         }
+
+        String ironSourceApplicationKey = null;
         if (data.has("ironSourceApplicationKey")) {
-            AdIds.ironSourceApplicationKey = data.get("ironSourceApplicationKey").toString();
+            ironSourceApplicationKey = data.get("ironSourceApplicationKey").toString();
         }
+
+        String appLovinSdkKey = null;
         if (data.has("appLovinSdkKey")) {
-            AdIds.appLovinSdkKey = data.get("appLovinSdkKey").toString();
+            appLovinSdkKey = data.get("appLovinSdkKey").toString();
         }
+
+        String adColonyAppId = null;
         if (data.has("adColonyAppId")) {
-            AdIds.adColonyAppId = data.get("adColonyAppId").toString();
+            adColonyAppId = data.get("adColonyAppId").toString();
         }
+
+        String adColonyBannerZoneId = null;
         if (data.has("adColonyBannerZoneId")) {
-            AdIds.adColonyBannerZoneId = data.get("adColonyBannerZoneId").toString();
+            adColonyBannerZoneId = data.get("adColonyBannerZoneId").toString();
         }
+
+        String adColonyInterstitialZoneId = null;
         if (data.has("adColonyInterstitialZoneId")) {
-            AdIds.adColonyInterstitialZoneId = data.get("adColonyInterstitialZoneId").toString();
+            adColonyInterstitialZoneId = data.get("adColonyInterstitialZoneId").toString();
         }
+
+        String adColonyRewardedZoneId = null;
         if (data.has("adColonyRewardedZoneId")) {
-            AdIds.adColonyRewardedZoneId = data.get("adColonyRewardedZoneId").toString();
+            adColonyRewardedZoneId = data.get("adColonyRewardedZoneId").toString();
         }
+
+        String unityGameId = null;
         if (data.has("unityGameId")) {
-            AdIds.unityGameId = data.get("unityGameId").toString();
+            unityGameId = data.get("unityGameId").toString();
         }
-        result.success("success");
+
+        boolean isFacebookEnabled = false;
+        if (data.has("facebookEnabled")) {
+            isFacebookEnabled = data.getBoolean("facebookEnabled");
+        }
+
+        return new AdConfiguration(bannerAdId,
+                interstitialAdId,
+                rewardAdId,
+                adColonyAppId,
+                adColonyBannerZoneId,
+                adColonyInterstitialZoneId,
+                adColonyRewardedZoneId,
+                vungleAppId,
+                ironSourceApplicationKey,
+                appLovinSdkKey,
+                unityGameId,
+                isFacebookEnabled
+        );
     }
 
-    void initializeAdManagerAndListenToEvents() {
-        AdManager.getInstance().init(new AdEvents() {
+    private void configureAdManager(AdConfiguration configuration) {
+        adManager.configure(configuration, new AdEvents() {
             @Override
-            public void interstitialSuccess(Object event) {
+            public void interstitialEvent(InterstitialAdEvent event) {
                 if (INTERSTITIAL_EVENTS != null) {
-                    INTERSTITIAL_EVENTS.success(event);
+                    INTERSTITIAL_EVENTS.success(event.getValue());
                 }
             }
 
             @Override
-            public void interstitialError(String errorCode, String errorMessage, Object errorDetails) {
-                if (INTERSTITIAL_EVENTS != null) {
-                    INTERSTITIAL_EVENTS.error(errorCode, errorMessage, errorDetails);
-                }
-            }
-
-            @Override
-            public void rewardSuccess(Object event) {
+            public void rewardEvent(RewardAdEvent event) {
                 if (REWARD_EVENTS != null) {
-                    REWARD_EVENTS.success(event);
-                }
-            }
-
-            @Override
-            public void rewardError(String errorCode, String errorMessage, Object errorDetails) {
-                if (REWARD_EVENTS != null) {
-                    REWARD_EVENTS.error(errorCode, errorMessage, errorDetails);
+                    REWARD_EVENTS.success(event.getValue());
                 }
             }
         });
     }
 
     @Override
-    public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-    }
-
-    @Override
     public void onAttachedToActivity(ActivityPluginBinding binding) {
-        if (binding.getActivity() != null) {
-            activity = binding.getActivity();
-        }
+        binding.getActivity();
+        activity = binding.getActivity();
     }
+
 
     @Override
-    public void onDetachedFromActivityForConfigChanges() {
-
-    }
+    public void onDetachedFromEngine(FlutterPluginBinding binding) { }
 
     @Override
-    public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
-
-    }
+    public void onDetachedFromActivityForConfigChanges() { }
 
     @Override
-    public void onDetachedFromActivity() {
+    public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) { }
 
-    }
+    @Override
+    public void onDetachedFromActivity() { }
 
-    void listenToEvents(Object arguments, EventChannel.EventSink events) {
+    private void listenToEvents(Object arguments, EventChannel.EventSink events) {
         if (arguments == null)
             return;
         if (arguments.toString().equals("interstitial")) {
@@ -204,7 +212,6 @@ public class MopubPlugin implements FlutterPlugin, MethodCallHandler, ActivityAw
         } else if (arguments.toString().equals("reward")) {
             REWARD_EVENTS = events;
         }
-        Log.d(TAG, "MoPub Plugin: " + (events != null ? "onListen" : "onCancel"));
     }
 
     @Override

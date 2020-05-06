@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mopub/mopub_ad.dart';
+import 'package:mopub/ad_manager.dart';
 
 void main() {
   const MethodChannel channel = MethodChannel('mopubad');
