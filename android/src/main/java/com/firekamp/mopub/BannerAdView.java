@@ -9,24 +9,16 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
-import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
-import com.mopub.common.MoPub;
-import com.mopub.common.SdkConfiguration;
-import com.mopub.common.SdkInitializationListener;
-import com.mopub.mobileads.MoPubErrorCode;
-import com.mopub.mobileads.MoPubView;
-
 import io.flutter.plugin.common.BinaryMessenger;
-import io.flutter.plugin.common.MethodCall;
-import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.StandardMessageCodec;
 import io.flutter.plugin.platform.PlatformView;
 import io.flutter.plugin.platform.PlatformViewFactory;
 
 
 class BannerAdViewFactory extends PlatformViewFactory {
+    static BannerAdView bannerAdView;
     private final BinaryMessenger messenger;
 
     public BannerAdViewFactory(BinaryMessenger messenger) {
@@ -36,120 +28,57 @@ class BannerAdViewFactory extends PlatformViewFactory {
 
     @Override
     public PlatformView create(Context context, int id, Object o) {
-        return new BannerAdView(context, messenger, id);
+        return bannerAdView = new BannerAdView(MopubPlugin.activity, messenger, id);
     }
+
 }
 
 
-public class BannerAdView implements PlatformView, MethodChannel.MethodCallHandler {
-    static MoPubView moPubView;
-    private final MethodChannel methodChannel;
-    Context context;
+public class BannerAdView implements PlatformView {
 
+    Context context;
     LinearLayout view;
+    int id = 0;
 
     BannerAdView(Context context, BinaryMessenger messenger, int id) {
-        this.context = context;
-        view = new LinearLayout(context.getApplicationContext());
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
-        params.gravity = Gravity.CENTER;
-        view.setLayoutParams(params);
-        methodChannel = new MethodChannel(messenger, "com.firekamp.mopub/banneradview_" + id);
-        methodChannel.setMethodCallHandler(this);
-
-    }
-
-    void loadBanner() {
-        if (moPubView.getParent() != null) {
-            ((ViewGroup) moPubView.getParent()).removeView(moPubView);
-        }
-        view.addView(moPubView);
-    }
-
-    void fetchAndLoad() {
+        try{
+            this.context = MopubPlugin.activity;
+            view = new LinearLayout(context.getApplicationContext());
             view.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
-//        if (moPubView == null) {
-            moPubView = new MoPubView(context);
-            moPubView.setAdSize(MoPubView.MoPubAdSize.HEIGHT_50);
-            moPubView.setAdUnitId(AdIds.banner);
-            moPubView.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
-            MoPub.initializeSdk(MopubPlugin.activity, new SdkConfiguration.Builder(AdIds.banner).build(), new SdkInitializationListener() {
-                @Override
-                public void onInitializationFinished() {
-                    Log.d(MopubPlugin.TAG, "onInitializationFinished");
-                    moPubView.loadAd();
-                }
-            });
-//        } else {
-//            loadBanner();
-//        }
-
-        moPubView.setBannerAdListener(new MoPubView.BannerAdListener() {
-
-            @Override
-            public void onBannerLoaded(@NonNull MoPubView banner) {
-                try {
-                    loadBanner();
-                    Log.d(MopubPlugin.TAG, "MobPub Ad onBannerLoaded");
-                } catch (Exception e) {
-                    Log.e(MopubPlugin.TAG, e.getMessage());
-                }
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+            params.gravity = Gravity.CENTER;
+            view.setLayoutParams(params);
+            if (AdManager.getInstance().moPubView.getParent() != null) {
+                ((ViewGroup) AdManager.getInstance().moPubView.getParent()).removeView(AdManager.getInstance().moPubView);
             }
+            view.addView(AdManager.getInstance().moPubView);
+            Log.d(MopubPlugin.TAG_BANNER, "MobPub BannerAdView Initialized" + view.toString());
+        }
+        catch(Exception e)
+        {
+            Log.e(MopubPlugin.TAG_BANNER, "MobPub BannerAdView BannerAdView" +e.getMessage());
+        }
 
-            @Override
-            public void onBannerFailed(MoPubView banner, MoPubErrorCode errorCode) {
-                Log.d(MopubPlugin.TAG, "MobPub Ad Loading Failed");
-            }
-
-            @Override
-            public void onBannerClicked(MoPubView banner) {
-                Log.d(MopubPlugin.TAG, "MobPub onBannerClicked");
-            }
-
-            @Override
-            public void onBannerExpanded(MoPubView banner) {
-                Log.d(MopubPlugin.TAG, "MobPub Ad Expanded");
-            }
-
-            @Override
-            public void onBannerCollapsed(MoPubView banner) {
-                Log.d(MopubPlugin.TAG, "MobPub Ad Collapsed");
-            }
-        });
     }
 
     @Override
     public View getView() {
+        Log.d(MopubPlugin.TAG_BANNER, "MobPub BannerAdView GetView" + view.toString());
         return view;
     }
 
     @Override
-    public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
-        try {
-            switch (methodCall.method) {
-                case BridgeMethods.showBanner:
-                    moPubView.setVisibility(View.VISIBLE);
-                    break;
-                case BridgeMethods.hideBanner:
-                    moPubView.setVisibility(View.GONE);
-                    break;
-                case BridgeMethods.fetchAndLoadBanner:
-                    fetchAndLoad();
-                    break;
-                case BridgeMethods.resumeBannerRefresh:
-                    //moPubView.fetchAndLoad();
-                    //TODO:Need to check what should we do here.
-                    break;
-                default:
-                    result.notImplemented();
-            }
-        } catch (Exception e) {
-            Log.e(MopubPlugin.TAG, e.getMessage());
-        }
+    public void onFlutterViewAttached(View flutterView) {
+        Log.d(MopubPlugin.TAG_BANNER, "MobPub BannerAdView onFlutterViewAttached" + view.toString());
+    }
 
+    @Override
+    public void onFlutterViewDetached() {
+        Log.d(MopubPlugin.TAG_BANNER, "MobPub BannerAdView onFlutterViewDetached" + view.toString());
     }
 
     @Override
     public void dispose() {
     }
+
 }

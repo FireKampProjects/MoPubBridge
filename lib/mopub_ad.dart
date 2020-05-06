@@ -81,6 +81,23 @@ class MoPubAd {
 
   }
 
+  static fetchAndLoadBanner()
+  {
+    try {
+      _methodChannel.invokeMethod('fetchAndLoadBanner');
+    } on PlatformException catch (e) {
+      print("Error fetching and loading the banner  ${e.message}");
+    }
+  }
+
+  static hideBanner()
+  {
+    try {
+      _methodChannel.invokeMethod('hideBanner');
+    } on PlatformException catch (e) {
+      print("Error precaching interstitial from bridge ${e.message}");
+    }
+  }
 
   static precacheInterstitialAd() {
     try {

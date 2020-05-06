@@ -2,10 +2,9 @@ package com.firekamp.mopub;
 
 import android.app.Activity;
 import android.util.Log;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
-
-import com.mopub.mobileads.MoPubView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,23 +23,22 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 /**
  * MopubPlugin
  */
-public class MopubPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware , EventChannel.StreamHandler {
+public class MopubPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware, EventChannel.StreamHandler {
 
     public final static String TAG = "MoPub";
+    public final static String TAG_BANNER = "MoPubBanner";
     static Activity activity;
-    static final String METHOD_CHANNEL="com.firekamp.mopub/method";
-    static final String EVENT_INTERSTITIAL_CHANNEL="com.firekamp.mopub/interstitial_stream";
-    static final String EVENT_REWARD_CHANNEL="com.firekamp.mopub/reward_stream";
-    static final String VIEW_BANNER="com.firekamp.mopub/banneradview";
+    static final String METHOD_CHANNEL = "com.firekamp.mopub/method";
+    static final String EVENT_INTERSTITIAL_CHANNEL = "com.firekamp.mopub/interstitial_stream";
+    static final String EVENT_REWARD_CHANNEL = "com.firekamp.mopub/reward_stream";
+    static final String VIEW_BANNER = "com.firekamp.mopub/banneradview";
     static EventChannel.EventSink INTERSTITIAL_EVENTS;
     static EventChannel.EventSink REWARD_EVENTS;
-
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
         final MethodChannel methodChannel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), METHOD_CHANNEL);
         final EventChannel eventInterstitialChannel = new EventChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), EVENT_INTERSTITIAL_CHANNEL);
         final EventChannel eventRewardChannel = new EventChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), EVENT_REWARD_CHANNEL);
-
 
         methodChannel.setMethodCallHandler(new MopubPlugin());
         eventInterstitialChannel.setStreamHandler(new MopubPlugin());
@@ -71,19 +69,21 @@ public class MopubPlugin implements FlutterPlugin, MethodCallHandler, ActivityAw
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-
         try {
             if (call.method.equals("init")) {
-                init(call,result);
-                AdManager.getInstance().init();
+                configure(call, result);
+                initializeAdManagerAndListenToEvents();
                 return;
             }
             if (AdIds.banner == null) {
-                result.error("002", "Not initialized. Please pass the data by MoPubAd.initialize(moPubData) ", null);
+                result.error(null, "Not initialized. Please pass the data by MoPubAd.initialize(moPubData) ", null);
                 return;
             }
-
-            if (call.method.equals(BridgeMethods.prefetchInterstitial)) {
+            if (call.method.equals(BridgeMethods.fetchAndLoadBanner)) {
+                AdManager.getInstance().fetchAndLoadBanner();
+            } else if (call.method.equals(BridgeMethods.hideBanner)) {
+                AdManager.getInstance().hideBanner();
+            } else if (call.method.equals(BridgeMethods.prefetchInterstitial)) {
                 AdManager.getInstance().fetchInterstitial();
             } else if (call.method.equals(BridgeMethods.prefetchReward)) {
                 AdManager.getInstance().fetchRewardVideo();
@@ -95,22 +95,19 @@ public class MopubPlugin implements FlutterPlugin, MethodCallHandler, ActivityAw
                 result.notImplemented();
             }
         } catch (Exception e) {
-            result.error("001",e.getMessage(),e);
+            result.error(null, e.getMessage(), e);
             Log.e(TAG, e.getMessage());
         }
     }
 
-    void init(MethodCall method, Result result) throws JSONException {
+    void configure(MethodCall method, Result result) throws JSONException {
         JSONObject data = new JSONObject(method.arguments().toString());
-
         if (data.has("bannerAdId")) {
             AdIds.banner = data.get("bannerAdId").toString();
         }
-
         if (data.has("interstitialAdId")) {
             AdIds.interstitial = data.get("interstitialAdId").toString();
         }
-
         if (data.has("rewardAdId")) {
             AdIds.reward = data.get("rewardAdId").toString();
         }
@@ -123,7 +120,6 @@ public class MopubPlugin implements FlutterPlugin, MethodCallHandler, ActivityAw
         if (data.has("appLovinSdkKey")) {
             AdIds.appLovinSdkKey = data.get("appLovinSdkKey").toString();
         }
-
         if (data.has("adColonyAppId")) {
             AdIds.adColonyAppId = data.get("adColonyAppId").toString();
         }
@@ -136,11 +132,42 @@ public class MopubPlugin implements FlutterPlugin, MethodCallHandler, ActivityAw
         if (data.has("adColonyRewardedZoneId")) {
             AdIds.adColonyRewardedZoneId = data.get("adColonyRewardedZoneId").toString();
         }
-
         if (data.has("unityGameId")) {
             AdIds.unityGameId = data.get("unityGameId").toString();
         }
         result.success("success");
+    }
+
+    void initializeAdManagerAndListenToEvents() {
+        AdManager.getInstance().init(new AdEvents() {
+            @Override
+            public void interstitialSuccess(Object event) {
+                if (INTERSTITIAL_EVENTS != null) {
+                    INTERSTITIAL_EVENTS.success(event);
+                }
+            }
+
+            @Override
+            public void interstitialError(String errorCode, String errorMessage, Object errorDetails) {
+                if (INTERSTITIAL_EVENTS != null) {
+                    INTERSTITIAL_EVENTS.error(errorCode, errorMessage, errorDetails);
+                }
+            }
+
+            @Override
+            public void rewardSuccess(Object event) {
+                if (REWARD_EVENTS != null) {
+                    REWARD_EVENTS.success(event);
+                }
+            }
+
+            @Override
+            public void rewardError(String errorCode, String errorMessage, Object errorDetails) {
+                if (REWARD_EVENTS != null) {
+                    REWARD_EVENTS.error(errorCode, errorMessage, errorDetails);
+                }
+            }
+        });
     }
 
     @Override
@@ -169,33 +196,24 @@ public class MopubPlugin implements FlutterPlugin, MethodCallHandler, ActivityAw
 
     }
 
+    void listenToEvents(Object arguments, EventChannel.EventSink events) {
+        if (arguments == null)
+            return;
+        if (arguments.toString().equals("interstitial")) {
+            INTERSTITIAL_EVENTS = events;
+        } else if (arguments.toString().equals("reward")) {
+            REWARD_EVENTS = events;
+        }
+        Log.d(TAG, "MoPub Plugin: " + (events != null ? "onListen" : "onCancel"));
+    }
+
     @Override
     public void onListen(Object arguments, EventChannel.EventSink events) {
-        if(arguments==null)
-            return;
-        if(arguments.toString().equals("interstitial"))
-        {
-            INTERSTITIAL_EVENTS=events;
-        }
-        else if(arguments.toString().equals("reward"))
-        {
-            REWARD_EVENTS=events;
-        }
-        Log.d(TAG,"onListen");
+        listenToEvents(arguments, events);
     }
 
     @Override
     public void onCancel(Object arguments) {
-        if(arguments==null)
-            return;
-        if(arguments.toString().equals("interstitial"))
-        {
-            INTERSTITIAL_EVENTS=null;
-        }
-        else if(arguments.toString().equals("reward"))
-        {
-            REWARD_EVENTS=null;
-        }
-        Log.d(TAG,"onCancel");
+        listenToEvents(arguments, null);
     }
 }

@@ -120,5 +120,7 @@ dependencies {
     implementation('com.mopub:mopub-sdk-native-video:5.12.0@aar') {
         transitive = true
     }
+
+    implementation 'com.google.code.gson:gson:2.8.6'
 }
 
