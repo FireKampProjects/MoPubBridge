@@ -7,8 +7,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
-import com.adcolony.sdk.AdColonyAppOptions;
-import com.google.gson.Gson;
 import com.mopub.common.AdapterConfiguration;
 import com.mopub.common.MoPub;
 import com.mopub.common.MoPubReward;
@@ -62,6 +60,7 @@ enum InterstitialAdEvent {
     DISMISSED(4);
 
     final private int value;
+
     InterstitialAdEvent(int value) {
         this.value = value;
     }
@@ -224,19 +223,12 @@ public class AdManager {
 
     private void configureThirdPartyNetworks() {
         //Third party networks
-       //TODO: Mani fix, ad colony is throwing errors
         if (adConfiguration.isAdColonyEnabled()) {
-            final AdColonyAdapterConfiguration adColonyAdapterConfiguration = new AdColonyAdapterConfiguration();//Since Library forces client option should not be null, but actual adcolony allows client as optional. We are using AdColonyAdapterConfigurationCustom
+            final AdColonyAdapterConfiguration adColonyAdapterConfiguration = new AdColonyAdapterConfiguration();
             Map<String, String> adColonyConfiguration = new HashMap<>();
-            AdColonyAppOptions appOptions = AdColonyAppOptions.getMoPubAppOptions(null);
-            appOptions.setGDPRConsentString("1");
-            appOptions.setGDPRRequired(true);
-            final Gson gson = new Gson();
-            String clientOption = gson.toJson(appOptions);
             adColonyConfiguration.put(AdAdapterValueConstants.appId, adConfiguration.adColonyAppId);
             final List<String> zoneIds = adConfiguration.adColonyZoneIds();
             adColonyConfiguration.put(AdAdapterValueConstants.allZoneIds, new JSONArray(zoneIds).toString());
-            adColonyConfiguration.put(AdAdapterValueConstants.clientOptions, clientOption);
             adColonyAdapterConfiguration.initializeNetwork(MopubPlugin.activity, adColonyConfiguration, new OnNetworkInitializationFinishedListener() {
                 @Override
                 public void onNetworkInitializationFinished(@NonNull Class<? extends AdapterConfiguration> clazz, @NonNull MoPubErrorCode moPubErrorCode) {
@@ -245,7 +237,7 @@ public class AdManager {
             });
         }
 
-        //TODO: Mani fix, ad colony is throwing errors
+        //TODO: Mani fix, vungle is throwing errors
         if (adConfiguration.isVungleEnabled()) {
             final VungleAdapterConfiguration vungleAdapterConfiguration = new VungleAdapterConfiguration();
             Map<String, String> vungleConfiguration = new HashMap<>();
@@ -404,7 +396,7 @@ public class AdManager {
 
             @Override
             public void onBannerFailed(MoPubView banner, MoPubErrorCode errorCode) {
-                Log.d(MopubPlugin.PLUGIN_TAG, "MobPub Banner Loading Failed");
+                Log.d(MopubPlugin.PLUGIN_TAG, "MobPub Banner Loading Failed. Error: " + errorCode);
             }
 
             @Override
