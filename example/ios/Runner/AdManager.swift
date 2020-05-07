@@ -61,77 +61,65 @@ public class AdManager: NSObject {
         return preset
     }
     
-    func configure(adConfig:AdConfiguration)
-    {
+    func configure(adConfig:AdConfiguration){
         self.adConfiguration=adConfig
-        if(adConfiguration!.isBannerEnabled())
-        {
-            configureBanner()
+        if(adConfig.isBannerEnabled()){
+            configureBanner(adConfig)
         }
-        if(adConfiguration!.isInterstitialEnabled())
-        {
-            configureInterstitial()
+        if(adConfig.isInterstitialEnabled()){
+            configureInterstitial(adConfig)
         }
-        if(adConfiguration!.isRewardEnabled())
-        {
-            configrueRewardVideo()
+        if(adConfig.isRewardEnabled()){
+            configrueRewardVideo(adConfig)
         }
-        configureThirdPartyNetwork()
+        configureThirdPartyNetwork(adConfig)
     }
     
-    func configureBanner()
-    {
-        bannerView = MPAdView(adUnitId:adConfiguration!.moPubBannerId)
-        bannerView!.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.size.width, height: self.bannerAdSize.height)
-        bannerView!.delegate = self
+    func configureBanner(_ adConfig:AdConfiguration){
+        bannerView = MPAdView(adUnitId:adConfig.moPubBannerId)
+        bannerView?.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.size.width, height: self.bannerAdSize.height)
+        bannerView?.delegate = self
     }
     
-    func configrueRewardVideo()
-    {
-        MPRewardedVideo.setDelegate(self, forAdUnitId: adConfiguration!.moPubRewardId)
+    func configrueRewardVideo(_ adConfig:AdConfiguration){
+        MPRewardedVideo.setDelegate(self, forAdUnitId: adConfig.moPubRewardId)
     }
     
-    func configureInterstitial()
-    {
-        interstitial = MPInterstitialAdController(forAdUnitId: adConfiguration!.moPubInterstitialId)
-        interstitial!.delegate = self
+    func configureInterstitial(_ adConfig:AdConfiguration){
+        interstitial = MPInterstitialAdController(forAdUnitId: adConfig.moPubInterstitialId)
+        interstitial?.delegate = self
     }
     
     func fetchAndLoadBanner() {
-        if let _ = bannerView!.superview {
+        if let _ = bannerView?.superview {
             print("Fetching and loading when already visible")
         } else {
             print("Fetching banner ad")
-            bannerView!.loadAd(withMaxAdSize: bannerAdSize)
+            bannerView?.loadAd(withMaxAdSize: bannerAdSize)
         }
     }
     
-    func configureThirdPartyNetwork()
-    {
-        let config = MPMoPubConfiguration(adUnitIdForAppInitialization: adConfiguration!.firstValidAdId())
+    func configureThirdPartyNetwork(_ adConfig : AdConfiguration){
+        let config = MPMoPubConfiguration(adUnitIdForAppInitialization: adConfig.firstValidAdId())
         let mediaConfigurations:NSMutableDictionary = [:]
         
-        if(adConfiguration!.isAdColonyEnabled())
-        {
-            let adColonySettings = [AdAdapterValueConstants.appId.rawValue: adConfiguration!.adColonyAppId,AdAdapterValueConstants.allZoneIds.rawValue:adConfiguration!.getZoneIds()] as [String : Any]
+        if(adConfig.isAdColonyEnabled()){
+            let adColonySettings = [AdAdapterValueConstants.appId.rawValue: adConfig.adColonyAppId ?? "",AdAdapterValueConstants.allZoneIds.rawValue:adConfig.getZoneIds()] as [String : Any]
             mediaConfigurations[AdAdapterConstants.adColony.rawValue] = adColonySettings
         }
         
-        if(adConfiguration!.isUnityEnabled())
-        {
-            let unitySettings = [AdAdapterConstants.unity.rawValue: adConfiguration!.unityGameId]
+        if(adConfig.isUnityEnabled()){
+            let unitySettings = [AdAdapterConstants.unity.rawValue: adConfig.unityGameId]
             mediaConfigurations[AdAdapterConstants.unity.rawValue] = unitySettings
         }
         
-        if(adConfiguration!.isIronSourceEnabled())
-        {
-            let ironsourceSettings = [AdAdapterValueConstants.applicationKey.rawValue:adConfiguration!.ironSourceApplicationKey]
+        if(adConfig.isIronSourceEnabled()){
+            let ironsourceSettings = [AdAdapterValueConstants.applicationKey.rawValue:adConfig.ironSourceApplicationKey]
             mediaConfigurations[AdAdapterConstants.ironSource.rawValue] = ironsourceSettings
         }
         
-        if(adConfiguration!.isVungleEnabled())
-        {
-            let vungleSettings = [AdAdapterValueConstants.appId.rawValue: adConfiguration!.vungleAppId]
+        if(adConfig.isVungleEnabled()){
+            let vungleSettings = [AdAdapterValueConstants.appId.rawValue: adConfig.vungleAppId]
             mediaConfigurations[AdAdapterConstants.vungle.rawValue] = vungleSettings
         }
         config.mediatedNetworkConfigurations = mediaConfigurations
@@ -144,66 +132,62 @@ public class AdManager: NSObject {
         
     }
     func hideBannerAd() {
-        if (adConfiguration!.isBannerEnabled()) {
-            bannerView!.stopAutomaticallyRefreshingContents()
-            bannerView!.removeFromSuperview()
+        if let banner = bannerView, let adconfig = adConfiguration, adconfig.isBannerEnabled() {
+            banner.stopAutomaticallyRefreshingContents()
+            banner.removeFromSuperview()
         }
         else
         {
-            //throw "Banner not configured"
+            assert(false, "Banner not configured")
         }
     }
     
     func showBannerAd() {
-        if (adConfiguration!.isBannerEnabled()) {
-            addBannerViewToView(bannerView!);
+        if let banner = bannerView, let adconfig = adConfiguration, adconfig.isBannerEnabled() {
+            addBannerViewToView(banner)
         }
-        else
-        {
-            //throw "Banner not configured"
+        else{
+            assert(false, "Banner not configured")
         }
     }
     
     func prefetchInterstitial() {
-        if (adConfiguration!.isInterstitialEnabled()) {
+        if let adconfig = adConfiguration, adconfig.isInterstitialEnabled() {
             print("Fetching interstitial ad")
-            interstitial!.loadAd()
+            interstitial?.loadAd()
         }
-        else
-        {
-            //throw "Interstitial not configured"
+        else{
+            assert(false, "Interstitial not configured")
         }
     }
     
     func prefetchReward() {
-        if (adConfiguration!.isRewardEnabled()) {
+        if let adconfig = adConfiguration, adconfig.isRewardEnabled() {
             print("Fetching reward ad")
             MPRewardedVideo.loadAd(withAdUnitID: adConfiguration?.moPubRewardId, withMediationSettings: [])
         }
-        else
-        {
-            //throw "Reward not configured"
+        else{
+            assert(false, "Reward not configured")
         }
     }
     
     func showInterstitialAd() {
-        if (adConfiguration!.isInterstitialEnabled()) {
-            if interstitial!.ready {
+        if let adconfig = adConfiguration, adconfig.isInterstitialEnabled() {
+            if interstitial?.ready ?? false {
                 print("Showing interstitial ad")
-                interstitial!.show(from: rootViewController)
+                interstitial?.show(from: rootViewController)
             } else {
                 prefetchInterstitial()
             }
         }
-        else
-        {
-            //throw "Interstitial not configured"
+        else{
+            assert(false, "Interstitial not configured")
         }
     }
     
     func showRewardAd() {
-        if (adConfiguration!.isRewardEnabled()) {
-            let adId = adConfiguration?.moPubRewardId
+        if let adconfig = adConfiguration, adconfig.isRewardEnabled() {
+            let adId = adconfig.moPubRewardId
             if MPRewardedVideo.hasAdAvailable(forAdUnitID: adId) {
                 guard let reward = MPRewardedVideo.availableRewards(forAdUnitID: adId)?.first, let mpReward = reward as? MPRewardedVideoReward else {
                     assert(false, "Busted reward")
@@ -217,9 +201,8 @@ public class AdManager: NSObject {
                 rewardStream?(.notFetched)
             }
         }
-        else
-        {
-            //throw AdNotConfiguredError("Reward not configured")
+        else{
+            assert(false, "Reward not configured")
         }
     }
 }
@@ -231,8 +214,9 @@ extension AdManager: MPAdViewDelegate {
     
     public func adViewDidLoadAd(_ view: MPAdView!, adSize: CGSize) {
         print("banner did load for id: \(view.adUnitId)")
-        
-        addBannerViewToView(bannerView!);
+        if let banner=bannerView{
+            addBannerViewToView(banner)
+        }
     }
     
     func addBannerViewToView(_ bannerView: UIView) {
@@ -288,7 +272,7 @@ extension AdManager: MPAdViewDelegate {
     
     public func adView(_ view: MPAdView!, didFailToLoadAdWithError error: Error!) {
         print("banner failed to load: \(error.localizedDescription)")
-        bannerView!.removeFromSuperview()
+        bannerView?.removeFromSuperview()
     }
 }
 

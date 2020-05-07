@@ -11,122 +11,113 @@ import Foundation
 
 class AdConfiguration
 {
-    let moPubBannerId: String
-    let moPubInterstitialId: String
-    let moPubRewardId: String
+    let moPubBannerId: String?
+    let moPubInterstitialId: String?
+    let moPubRewardId: String?
     
     //AdColony
-    let adColonyAppId: String
-    let adColonyBannerZoneId: String
-    let adColonyInterstitialZoneId: String
-    let adColonyRewardedZoneId: String
+    let adColonyAppId: String?
+    let adColonyBannerZoneId: String?
+    let adColonyInterstitialZoneId: String?
+    let adColonyRewardedZoneId: String?
     
     //Vungle
-    let vungleAppId: String
+    let vungleAppId: String?
     //IronSource
-    let ironSourceApplicationKey: String
+    let ironSourceApplicationKey: String?
     
     //AppLovin
-    let appLovinSdkKey: String
+    let appLovinSdkKey: String?
     
     //Unity
-    let unityGameId: String
+    let unityGameId: String?
     
     //Facebook
-    let isFacebookEnabled: Bool
+    let isFacebookEnabled: Bool?
     
     
-    init(moPubBannerId:String,
-         moPubInterstitialId:String,
-         moPubRewardId:String,
-         adColonyAppId:String,
-         adColonyBannerZoneId:String,
-         adColonyInterstitialZoneId:String,
-         adColonyRewardedZoneId:String,
-         vungleAppId:String,
-         ironSourceApplicationKey:String,
-         appLovinSdkKey:String,
-         unityGameId:String,
-         isFacebookEnabled:Bool)
-    {
-        self.moPubBannerId=moPubBannerId;
-        self.moPubInterstitialId=moPubInterstitialId;
-        self.moPubRewardId=moPubRewardId;
-        self.adColonyAppId=adColonyAppId;
-        self.adColonyBannerZoneId=adColonyBannerZoneId;
-        self.adColonyInterstitialZoneId=adColonyInterstitialZoneId;
-        self.adColonyRewardedZoneId=adColonyRewardedZoneId;
-        self.vungleAppId=vungleAppId;
-        self.ironSourceApplicationKey=ironSourceApplicationKey;
-        self.appLovinSdkKey=appLovinSdkKey;
-        self.unityGameId=unityGameId;
-        self.isFacebookEnabled=isFacebookEnabled;
+    init(moPubBannerId:String?,
+         moPubInterstitialId:String?,
+         moPubRewardId:String?,
+         adColonyAppId:String?,
+         adColonyBannerZoneId:String?,
+         adColonyInterstitialZoneId:String?,
+         adColonyRewardedZoneId:String?,
+         vungleAppId:String?,
+         ironSourceApplicationKey:String?,
+         appLovinSdkKey:String?,
+         unityGameId:String?,
+         isFacebookEnabled:Bool){
+        self.moPubBannerId = moPubBannerId
+        self.moPubInterstitialId = moPubInterstitialId
+        self.moPubRewardId = moPubRewardId
+        self.adColonyAppId = adColonyAppId
+        self.adColonyBannerZoneId = adColonyBannerZoneId
+        self.adColonyInterstitialZoneId = adColonyInterstitialZoneId
+        self.adColonyRewardedZoneId = adColonyRewardedZoneId
+        self.vungleAppId = vungleAppId
+        self.ironSourceApplicationKey = ironSourceApplicationKey
+        self.appLovinSdkKey = appLovinSdkKey
+        self.unityGameId = unityGameId
+        self.isFacebookEnabled = isFacebookEnabled
     }
     
     
-    func firstValidAdId() -> String!
-    {
+    func firstValidAdId() -> String!{
         if (isBannerEnabled()) {
             return moPubBannerId;
         }
-        
         if (isInterstitialEnabled()) {
             return moPubInterstitialId;
         }
-        
         if (isRewardEnabled()) {
             return moPubRewardId;
         }
-        
         return nil;
     }
     
     func isUnityEnabled() -> Bool {
-        return !unityGameId.isEmpty
+        return !(unityGameId?.isEmpty ?? true)
     }
     
     func isAppLovinEnabled() -> Bool {
-        return !appLovinSdkKey.isEmpty
+        return !(appLovinSdkKey?.isEmpty ?? true)
     }
     
     func isIronSourceEnabled() -> Bool {
-        return !ironSourceApplicationKey.isEmpty
+        return !(ironSourceApplicationKey?.isEmpty ?? true)
     }
     
     func isVungleEnabled() -> Bool {
-        return !vungleAppId.isEmpty
+        return !(vungleAppId?.isEmpty ?? true)
     }
     
     func isAdColonyEnabled() -> Bool {
-        return !adColonyAppId.isEmpty
+        return !(adColonyAppId?.isEmpty ?? true)
     }
     
     func isBannerEnabled() -> Bool {
-        return !moPubBannerId.isEmpty
+        return !(moPubBannerId?.isEmpty ?? true)
     }
     
     func isRewardEnabled() -> Bool {
-        return !moPubRewardId.isEmpty
+        return !(moPubRewardId?.isEmpty ?? true)
     }
     
     func isInterstitialEnabled() -> Bool {
-        return !moPubInterstitialId.isEmpty
+        return !(moPubInterstitialId?.isEmpty ?? true)
     }
     
-    func getZoneIds() -> [String]
-    {
+    func getZoneIds() -> [String]{
         var zoneIds:[String]=[]
-        if(!adColonyBannerZoneId.isEmpty)
-        {
-            zoneIds.append(adColonyBannerZoneId)
+        if let bannerId = adColonyBannerZoneId, !bannerId.isEmpty {
+            zoneIds.append(adColonyBannerZoneId!)
         }
-        if(!adColonyInterstitialZoneId.isEmpty)
-        {
-            zoneIds.append(adColonyInterstitialZoneId)
+        if let interstitialId = adColonyBannerZoneId, !interstitialId.isEmpty {
+            zoneIds.append(interstitialId)
         }
-        if(!adColonyRewardedZoneId.isEmpty)
-        {
-            zoneIds.append(adColonyRewardedZoneId)
+        if let rewardId = adColonyBannerZoneId, !rewardId.isEmpty {
+            zoneIds.append(rewardId)
         }
         return zoneIds
     }

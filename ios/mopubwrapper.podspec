@@ -23,7 +23,7 @@ A new Flutter plugin.
   s.dependency 'MoPub-FacebookAudienceNetwork-Adapters'
   s.dependency 'MoPub-AdMob-Adapters'
   s.dependency 'MoPub-AdColony-Adapters'
-  s.platform = :ios, '10.0'
+  s.platform = :ios, '9.0'
   s.static_framework = true
 
   # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.

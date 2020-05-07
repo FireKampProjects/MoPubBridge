@@ -85,9 +85,10 @@ public class NativeBridging {
         
         if methodCall == BridgeMethods.configure.rawValue {
             let adConfiguration=configure(call)
-            adManager.configure(adConfig : adConfiguration!)
-            print(adConfiguration!)
-            result("success")
+            if let adconfig=adConfiguration{
+              adManager.configure(adConfig :adconfig)
+            }
+            result(nil)
         }
         else if methodCall == BridgeMethods.fetchAndLoadBanner.rawValue {
             adManager.fetchAndLoadBanner()
@@ -113,84 +114,46 @@ public class NativeBridging {
         } 
     }
 
-    func configure(_ call:FlutterMethodCall) -> AdConfiguration?
-    {
+    func configure(_ call:FlutterMethodCall) -> AdConfiguration?{
         var adConfiguration : AdConfiguration?
-        let stringJson = String(describing: call.arguments!)
-        let data = stringJson.data(using: .utf8)
+        guard let arguments: String = call.arguments as? String else {
+            assert(false, "Arguments are empty")
+            return nil
+        }
+    
+        let data = arguments.data(using: .utf8)
         do {
             if let json = try JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any] {
-                var bannerId=""
-                if let bannerIdString = json["bannerAdId"] as? String {
-                    bannerId=bannerIdString;
-                }
+                let bannerId: String? = json["bannerAdId"] as? String
                 
-                var interstitialAdId=""
-                if let interstitialAdIdString = json["interstitialAdId"] as? String {
-                    interstitialAdId=interstitialAdIdString;
-                }
+                let interstitialAdId: String? = json["interstitialAdId"] as? String
                 
-                var rewardAdId=""
-                if let rewardAdIdString = json["rewardAdId"] as? String {
-                    rewardAdId=rewardAdIdString;
-                }
+                let rewardAdId: String? = json["rewardAdId"] as? String
+                 
+                let vungleAppId: String? = json["vungleAppId"] as? String
                 
+                let ironSourceApplicationKey: String? = json["ironSourceApplicationKey"] as? String
                 
-                var vungleAppId=""
-                if let vungleAppIdString = json["vungleAppId"] as? String {
-                    vungleAppId=vungleAppIdString;
-                }
+                let appLovinSdkKey: String? = json["appLovinSdkKey"] as? String
                 
-                var ironSourceApplicationKey: String=""
-                if let ironSourceApplicationKeyString = json["ironSourceApplicationKey"] as? String {
-                    ironSourceApplicationKey=ironSourceApplicationKeyString;
-                }
+                let adColonyAppId: String? = json["adColonyAppId"] as? String
                 
-                var appLovinSdkKey=""
-                if let appLovinSdkKeyString = json["appLovinSdkKey"] as? String {
-                    appLovinSdkKey=appLovinSdkKeyString;
-                }
+                let adColonyBannerZoneId: String? = json["adColonyBannerZoneId"] as? String
                 
+                let adColonyInterstitialZoneId: String? = json["adColonyInterstitialZoneId"] as? String
                 
-                var adColonyAppId=""
-                if let adColonyAppIdString = json["adColonyAppId"] as? String {
-                    adColonyAppId=adColonyAppIdString;
-                }
+                let adColonyRewardedZoneId: String? = json["adColonyRewardedZoneId"] as? String
                 
+                let unityGameId: String? = json["unityGameId"] as? String
                 
-                var adColonyBannerZoneId=""
-                if let adColonyBannerZoneIdString = json["adColonyBannerZoneId"] as? String {
-                    adColonyBannerZoneId=adColonyBannerZoneIdString;
-                }
+                let isFacebookEnabled: Bool = json["facebookEnabled"] as? Bool ?? false
                 
-                var adColonyInterstitialZoneId=""
-                if let adColonyInterstitialZoneIdString = json["adColonyInterstitialZoneId"] as? String {
-                    adColonyInterstitialZoneId=adColonyInterstitialZoneIdString;
-                }
-                
-                
-                var adColonyRewardedZoneId=""
-                if let adColonyRewardedZoneIdString = json["adColonyRewardedZoneId"] as? String {
-                    adColonyRewardedZoneId=adColonyRewardedZoneIdString;
-                }
-                
-                
-                var unityGameId=""
-                if let unityGameIdString = json["unityGameId"] as? String {
-                    unityGameId=unityGameIdString;
-                }
-                var isFacebookEnabled=false
-                if let isFacebookEnabledBoolean = json["facebookEnabled"] as? Bool {
-                    isFacebookEnabled=isFacebookEnabledBoolean;
-                }
-                
-                adConfiguration = AdConfiguration(moPubBannerId: bannerId, moPubInterstitialId: interstitialAdId, moPubRewardId: rewardAdId, adColonyAppId: adColonyAppId, adColonyBannerZoneId: adColonyBannerZoneId, adColonyInterstitialZoneId: adColonyInterstitialZoneId, adColonyRewardedZoneId: adColonyRewardedZoneId, vungleAppId: vungleAppId, ironSourceApplicationKey: ironSourceApplicationKey, appLovinSdkKey: appLovinSdkKey, unityGameId: unityGameId, isFacebookEnabled:isFacebookEnabled);
-                
+                adConfiguration = AdConfiguration(moPubBannerId: bannerId, moPubInterstitialId: interstitialAdId, moPubRewardId: rewardAdId, adColonyAppId: adColonyAppId, adColonyBannerZoneId: adColonyBannerZoneId, adColonyInterstitialZoneId: adColonyInterstitialZoneId, adColonyRewardedZoneId: adColonyRewardedZoneId, vungleAppId: vungleAppId, ironSourceApplicationKey: ironSourceApplicationKey, appLovinSdkKey: appLovinSdkKey, unityGameId: unityGameId, isFacebookEnabled:isFacebookEnabled)
                }
         } catch let error as NSError {
             print(error)
         }
-        return adConfiguration;
+        return adConfiguration
     }
 }
 
