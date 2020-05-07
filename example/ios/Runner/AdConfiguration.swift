@@ -110,12 +110,12 @@ class AdConfiguration
     }
     
     func isInterstitialEnabled() -> Bool {
-        return !moPubRewardId.isEmpty
+        return !moPubInterstitialId.isEmpty
     }
     
     func getZoneIds() -> [String]
     {
-        var zoneIds=[]
+        var zoneIds:[String]=[]
         if(!adColonyBannerZoneId.isEmpty)
         {
             zoneIds.append(adColonyBannerZoneId)
