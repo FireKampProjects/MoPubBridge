@@ -84,8 +84,10 @@ public class NativeBridging {
         }
         
         if methodCall == BridgeMethods.configure.rawValue {
+            let adConfiguration=configure(call)
+            adManager.configure(adConfig : adConfiguration!)
+            print(adConfiguration!)
             result("success")
-            configure(call)
         }
         else if methodCall == BridgeMethods.fetchAndLoadBanner.rawValue {
             adManager.fetchAndLoadBanner()
@@ -111,21 +113,84 @@ public class NativeBridging {
         } 
     }
 
-    func configure(_ call:FlutterMethodCall) -> AdConfiguration
+    func configure(_ call:FlutterMethodCall) -> AdConfiguration?
     {
+        var adConfiguration : AdConfiguration?
         let stringJson = String(describing: call.arguments!)
         let data = stringJson.data(using: .utf8)
         do {
-            if let jsonArray = try JSONSerialization.jsonObject(with: data!, options : []) as? [Dictionary<String,Any>]
-            {
-               print(jsonArray) // use the json here
-            } else {
-                print("bad json")
-            }
+            if let json = try JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any] {
+                var bannerId=""
+                if let bannerIdString = json["bannerAdId"] as? String {
+                    bannerId=bannerIdString;
+                }
+                
+                var interstitialAdId=""
+                if let interstitialAdIdString = json["interstitialAdId"] as? String {
+                    interstitialAdId=interstitialAdIdString;
+                }
+                
+                var rewardAdId=""
+                if let rewardAdIdString = json["rewardAdId"] as? String {
+                    rewardAdId=rewardAdIdString;
+                }
+                
+                
+                var vungleAppId=""
+                if let vungleAppIdString = json["vungleAppId"] as? String {
+                    vungleAppId=vungleAppIdString;
+                }
+                
+                var ironSourceApplicationKey: String=""
+                if let ironSourceApplicationKeyString = json["ironSourceApplicationKey"] as? String {
+                    ironSourceApplicationKey=ironSourceApplicationKeyString;
+                }
+                
+                var appLovinSdkKey=""
+                if let appLovinSdkKeyString = json["appLovinSdkKey"] as? String {
+                    appLovinSdkKey=appLovinSdkKeyString;
+                }
+                
+                
+                var adColonyAppId=""
+                if let adColonyAppIdString = json["adColonyAppId"] as? String {
+                    adColonyAppId=adColonyAppIdString;
+                }
+                
+                
+                var adColonyBannerZoneId=""
+                if let adColonyBannerZoneIdString = json["adColonyBannerZoneId"] as? String {
+                    adColonyBannerZoneId=adColonyBannerZoneIdString;
+                }
+                
+                var adColonyInterstitialZoneId=""
+                if let adColonyInterstitialZoneIdString = json["adColonyInterstitialZoneId"] as? String {
+                    adColonyInterstitialZoneId=adColonyInterstitialZoneIdString;
+                }
+                
+                
+                var adColonyRewardedZoneId=""
+                if let adColonyRewardedZoneIdString = json["adColonyRewardedZoneId"] as? String {
+                    adColonyRewardedZoneId=adColonyRewardedZoneIdString;
+                }
+                
+                
+                var unityGameId=""
+                if let unityGameIdString = json["unityGameId"] as? String {
+                    unityGameId=unityGameIdString;
+                }
+                var isFacebookEnabled=false
+                if let isFacebookEnabledBoolean = json["facebookEnabled"] as? Bool {
+                    isFacebookEnabled=isFacebookEnabledBoolean;
+                }
+                
+                adConfiguration = AdConfiguration(moPubBannerId: bannerId, moPubInterstitialId: interstitialAdId, moPubRewardId: rewardAdId, adColonyAppId: adColonyAppId, adColonyBannerZoneId: adColonyBannerZoneId, adColonyInterstitialZoneId: adColonyInterstitialZoneId, adColonyRewardedZoneId: adColonyRewardedZoneId, vungleAppId: vungleAppId, ironSourceApplicationKey: ironSourceApplicationKey, appLovinSdkKey: appLovinSdkKey, unityGameId: unityGameId, isFacebookEnabled:isFacebookEnabled);
+                
+               }
         } catch let error as NSError {
             print(error)
         }
-        return AdConfiguration(moPubBannerId: "", moPubInterstitialId: "", moPubRewardId: "", adColonyAppId: "", adColonyBannerZoneId: "", adColonyInterstitialZoneId: "", adColonyRewardedZoneId: "", vungleAppId: "", ironSourceApplicationKey: "", appLovinSdkKey: "", unityGameId: "", isFacebookEnabled:true);
+        return adConfiguration;
     }
 }
 

@@ -11,30 +11,30 @@ import Foundation
 
 class AdConfiguration
 {
-    private let moPubBannerId: String
-    private let moPubInterstitialId: String
-    private let moPubRewardId: String
+    let moPubBannerId: String
+    let moPubInterstitialId: String
+    let moPubRewardId: String
     
     //AdColony
-    private let adColonyAppId: String
-    private let adColonyBannerZoneId: String
-    private let adColonyInterstitialZoneId: String
-    private let adColonyRewardedZoneId: String
-
+    let adColonyAppId: String
+    let adColonyBannerZoneId: String
+    let adColonyInterstitialZoneId: String
+    let adColonyRewardedZoneId: String
+    
     //Vungle
-    private let vungleAppId: String
+    let vungleAppId: String
     //IronSource
-    private let ironSourceApplicationKey: String
+    let ironSourceApplicationKey: String
     
     //AppLovin
-    private let appLovinSdkKey: String
+    let appLovinSdkKey: String
     
     //Unity
-    private let unityGameId: String
+    let unityGameId: String
     
     //Facebook
-    private let isFacebookEnabled: Bool
-     
+    let isFacebookEnabled: Bool
+    
     
     init(moPubBannerId:String,
          moPubInterstitialId:String,
@@ -63,37 +63,72 @@ class AdConfiguration
         self.isFacebookEnabled=isFacebookEnabled;
     }
     
+    
+    func firstValidAdId() -> String!
+    {
+        if (isBannerEnabled()) {
+            return moPubBannerId;
+        }
+        
+        if (isInterstitialEnabled()) {
+            return moPubInterstitialId;
+        }
+        
+        if (isRewardEnabled()) {
+            return moPubRewardId;
+        }
+        
+        return nil;
+    }
+    
     func isUnityEnabled() -> Bool {
         return !unityGameId.isEmpty
     }
-
+    
     func isAppLovinEnabled() -> Bool {
-         return !appLovinSdkKey.isEmpty
-     }
-
+        return !appLovinSdkKey.isEmpty
+    }
+    
     func isIronSourceEnabled() -> Bool {
-         return !ironSourceApplicationKey.isEmpty
-     }
-
+        return !ironSourceApplicationKey.isEmpty
+    }
+    
     func isVungleEnabled() -> Bool {
-         return !vungleAppId.isEmpty
-     }
-
+        return !vungleAppId.isEmpty
+    }
+    
     func isAdColonyEnabled() -> Bool {
-         return !adColonyAppId.isEmpty
-     }
+        return !adColonyAppId.isEmpty
+    }
     
     func isBannerEnabled() -> Bool {
-            return !moPubBannerId.isEmpty
+        return !moPubBannerId.isEmpty
+    }
+    
+    func isRewardEnabled() -> Bool {
+        return !moPubRewardId.isEmpty
+    }
+    
+    func isInterstitialEnabled() -> Bool {
+        return !moPubRewardId.isEmpty
+    }
+    
+    func getZoneIds() -> [String]
+    {
+        var zoneIds=[]
+        if(!adColonyBannerZoneId.isEmpty)
+        {
+            zoneIds.append(adColonyBannerZoneId)
         }
-
-       func isRewardEnabled() -> Bool {
-            return !moPubRewardId.isEmpty
+        if(!adColonyInterstitialZoneId.isEmpty)
+        {
+            zoneIds.append(adColonyInterstitialZoneId)
         }
-
-       func isInterstitialEnabled() -> Bool {
-            return !moPubRewardId.isEmpty
+        if(!adColonyRewardedZoneId.isEmpty)
+        {
+            zoneIds.append(adColonyRewardedZoneId)
         }
-     
+        return zoneIds
+    }
     
 }
