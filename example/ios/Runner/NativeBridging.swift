@@ -84,6 +84,7 @@ public class NativeBridging {
         }
         
         if methodCall == BridgeMethods.configure.rawValue {
+            result("success")
             configure(call)
         }
         else if methodCall == BridgeMethods.fetchAndLoadBanner.rawValue {
