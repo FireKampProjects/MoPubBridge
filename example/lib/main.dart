@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:mopub/mopub.dart';
-import 'package:mopub_example/second_page.dart';
+import 'package:mopubwrapper/mopub.dart';
+import 'package:mopubwrapper_example/second_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -20,7 +20,6 @@ Future<String> initAds() async {
 //          ironSource: "",
 //          unity: "",
 //          vungle: "");
-
     moPubData = new MoPubData(
         bannerAdId: "0ac59b0996d947309c33f59d6676399f",
         interstitialAdId: "4f117153f5c24fa6a3a92b818a5eb630",
@@ -51,7 +50,9 @@ Future<String> initAds() async {
         vungleAppId: "5ea85d0d1aeed60001704b3f",
         facebookEnabled: true);
   }
-  return await AdManager.initialize(moPubData);
+  var isInitialized=await AdManager.initialize(moPubData);
+  AdManager.fetchAndLoadBanner();
+  return isInitialized;
 }
 
 class MyApp extends StatefulWidget {
@@ -103,7 +104,7 @@ class _MyAppState extends State<MyApp> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
                       getButton("showBannerAd", onPressed: () {
-                        AdManager.fetchAndLoadBanner();
+                        AdManager.showBanner();
                       }),
                       getButton("hideBannerAd", onPressed: () {
                         AdManager.hideBanner();
@@ -126,7 +127,7 @@ class _MyAppState extends State<MyApp> {
                           return SecondPage();
                         }));
                       }),
-                      Container(height: 50, child:MoPubBannerView()),
+                      Container(height: 50, child: MoPubBannerView()),
                     ],
                   ),
                 ),
@@ -139,5 +140,4 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
-
 }

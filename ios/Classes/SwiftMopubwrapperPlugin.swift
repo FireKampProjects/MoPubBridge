@@ -1,10 +1,10 @@
 import Flutter
 import UIKit
 
-public class SwiftMopubPlugin: NSObject, FlutterPlugin {
+public class SwiftMopubwrapperPlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "mopub", binaryMessenger: registrar.messenger())
-    let instance = SwiftMopubPlugin()
+    let channel = FlutterMethodChannel(name: "mopubwrapper", binaryMessenger: registrar.messenger())
+    let instance = SwiftMopubwrapperPlugin()
     registrar.addMethodCallDelegate(instance, channel: channel)
   }
 

@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mopub/models/mopub_data.dart';
+import 'package:mopubwrapper/models/mopub_data.dart';
 
 enum InterstitialAdStatus {
   loaded,

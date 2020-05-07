@@ -1,4 +1,4 @@
-package com.firekamp.mopub;
+package com.firekamp.mopubwrapper;
 import android.content.Context;
 import android.view.Gravity;
 import android.view.View;
@@ -22,7 +22,7 @@ class BannerAdViewFactory extends PlatformViewFactory {
     @Override
     public PlatformView create(Context context, int id, Object o) {
         final MoPubView bannerView = AdManager.getInstance().getBannerView();
-        return new BannerAdView(MopubPlugin.activity, bannerView);
+        return new BannerAdView(MopubwrapperPlugin.activity, bannerView);
     }
 
 }

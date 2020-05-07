@@ -1,4 +1,4 @@
-package com.firekamp.mopub;
+package com.firekamp.mopubwrapper;
 
 import android.text.TextUtils;
 

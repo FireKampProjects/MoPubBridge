@@ -1,4 +1,4 @@
-package com.firekamp.mopub;
+package com.firekamp.mopubwrapper;
 
 import android.util.Log;
 import android.view.View;
@@ -132,13 +132,13 @@ public class AdManager {
     }
 
     void showBanner() {
-        toggleBanner(false);
+        toggleBanner(true);
     }
 
     void fetchInterstitial() {
         if (mMoPubInterstitial != null) {
             mMoPubInterstitial.load();
-            Log.d(MopubPlugin.PLUGIN_TAG, "Interstitial Load Called");
+            Log.d(MopubwrapperPlugin.PLUGIN_TAG, "Interstitial Load Called");
         } else {
             throw new IllegalStateException("Interstitial not configured and trying to fetch");
         }
@@ -148,10 +148,10 @@ public class AdManager {
         if (mMoPubInterstitial != null) {
             if (mMoPubInterstitial.isReady()) {
                 mMoPubInterstitial.show();
-                Log.d(MopubPlugin.PLUGIN_TAG, "Interstitial Shown");
+                Log.d(MopubwrapperPlugin.PLUGIN_TAG, "Interstitial Shown");
             } else {
                 adEvents.interstitialEvent(InterstitialAdEvent.FAILED);
-                Log.e(MopubPlugin.PLUGIN_TAG, "Interstitial is not ready");
+                Log.e(MopubwrapperPlugin.PLUGIN_TAG, "Interstitial is not ready");
             }
         } else {
             throw new IllegalStateException("Interstitial not configured and trying to show");
@@ -166,25 +166,25 @@ public class AdManager {
                     MoPubReward currentReward = MoPubRewardedVideos.getAvailableRewards(rewardId).iterator().next();
                     MoPubRewardedVideos.selectReward(rewardId, currentReward);
                     MoPubRewardedVideos.showRewardedVideo(rewardId);
-                    Log.d(MopubPlugin.PLUGIN_TAG, "Reward Show Called");
+                    Log.d(MopubwrapperPlugin.PLUGIN_TAG, "Reward Show Called");
                 } else {
                     adEvents.rewardEvent(RewardAdEvent.FAILED);
-                    Log.e(MopubPlugin.PLUGIN_TAG, "Reward not found");
+                    Log.e(MopubwrapperPlugin.PLUGIN_TAG, "Reward not found");
                 }
             } else {
                 adEvents.rewardEvent(RewardAdEvent.NOT_FETCHED);
-                Log.e(MopubPlugin.PLUGIN_TAG, "Reward not found");
+                Log.e(MopubwrapperPlugin.PLUGIN_TAG, "Reward not found");
             }
         } catch (Exception e) {
             adEvents.rewardEvent(RewardAdEvent.FAILED);
-            Log.e(MopubPlugin.PLUGIN_TAG, "showRewardVideo" + RewardAdEvent.FAILED + e.getMessage());
+            Log.e(MopubwrapperPlugin.PLUGIN_TAG, "showRewardVideo" + RewardAdEvent.FAILED + e.getMessage());
         }
     }
 
     void fetchRewardVideo() {
         if (adConfiguration.isRewardEnabled()) {
             MoPubRewardedVideos.loadRewardedVideo(adConfiguration.moPubRewardId);
-            Log.d(MopubPlugin.PLUGIN_TAG, "Reward video load called");
+            Log.d(MopubwrapperPlugin.PLUGIN_TAG, "Reward video load called");
         } else {
             throw new IllegalStateException("Reward not configured");
         }
@@ -194,10 +194,10 @@ public class AdManager {
         try {
             this.adConfiguration = configuration;
             adEvents = adEventsCallBack;
-            MoPub.initializeSdk(MopubPlugin.activity, new SdkConfiguration.Builder(adConfiguration.firstValidAdId()).build(), new SdkInitializationListener() {
+            MoPub.initializeSdk(MopubwrapperPlugin.activity, new SdkConfiguration.Builder(adConfiguration.firstValidAdId()).build(), new SdkInitializationListener() {
                 @Override
                 public void onInitializationFinished() {
-                    Log.d(MopubPlugin.PLUGIN_TAG, "SDK initialization Finished");
+                    Log.d(MopubwrapperPlugin.PLUGIN_TAG, "SDK initialization Finished");
                 }
             });
 
@@ -216,7 +216,7 @@ public class AdManager {
             configureThirdPartyNetworks();
 
         } catch (Exception e) {
-            Log.e(MopubPlugin.PLUGIN_TAG, "configure" + e.getMessage());
+            Log.e(MopubwrapperPlugin.PLUGIN_TAG, "configure" + e.getMessage());
         }
 
     }
@@ -229,10 +229,10 @@ public class AdManager {
             adColonyConfiguration.put(AdAdapterValueConstants.appId, adConfiguration.adColonyAppId);
             final List<String> zoneIds = adConfiguration.adColonyZoneIds();
             adColonyConfiguration.put(AdAdapterValueConstants.allZoneIds, new JSONArray(zoneIds).toString());
-            adColonyAdapterConfiguration.initializeNetwork(MopubPlugin.activity, adColonyConfiguration, new OnNetworkInitializationFinishedListener() {
+            adColonyAdapterConfiguration.initializeNetwork(MopubwrapperPlugin.activity, adColonyConfiguration, new OnNetworkInitializationFinishedListener() {
                 @Override
                 public void onNetworkInitializationFinished(@NonNull Class<? extends AdapterConfiguration> clazz, @NonNull MoPubErrorCode moPubErrorCode) {
-                    Log.d(MopubPlugin.PLUGIN_TAG, "AdColony onNetworkInitializationFinished " + moPubErrorCode);
+                    Log.d(MopubwrapperPlugin.PLUGIN_TAG, "AdColony onNetworkInitializationFinished " + moPubErrorCode);
                 }
             });
         }
@@ -242,10 +242,10 @@ public class AdManager {
             final VungleAdapterConfiguration vungleAdapterConfiguration = new VungleAdapterConfiguration();
             Map<String, String> vungleConfiguration = new HashMap<>();
             vungleConfiguration.put(AdAdapterValueConstants.appId, adConfiguration.vungleAppId);
-            vungleAdapterConfiguration.initializeNetwork(MopubPlugin.activity, vungleConfiguration, new OnNetworkInitializationFinishedListener() {
+            vungleAdapterConfiguration.initializeNetwork(MopubwrapperPlugin.activity, vungleConfiguration, new OnNetworkInitializationFinishedListener() {
                 @Override
                 public void onNetworkInitializationFinished(@NonNull Class<? extends AdapterConfiguration> clazz, @NonNull MoPubErrorCode moPubErrorCode) {
-                    Log.d(MopubPlugin.PLUGIN_TAG, "Vungle onNetworkInitializationFinished " + moPubErrorCode);
+                    Log.d(MopubwrapperPlugin.PLUGIN_TAG, "Vungle onNetworkInitializationFinished " + moPubErrorCode);
                 }
             });
         }
@@ -254,10 +254,10 @@ public class AdManager {
             AppLovinAdapterConfiguration appLovinAdapterConfiguration = new AppLovinAdapterConfiguration();
             Map<String, String> appLovinConfiguration = new HashMap<String, String>();
             appLovinConfiguration.put(AdAdapterValueConstants.sdkKey, adConfiguration.appLovinSdkKey);
-            appLovinAdapterConfiguration.initializeNetwork(MopubPlugin.activity, appLovinConfiguration, new OnNetworkInitializationFinishedListener() {
+            appLovinAdapterConfiguration.initializeNetwork(MopubwrapperPlugin.activity, appLovinConfiguration, new OnNetworkInitializationFinishedListener() {
                 @Override
                 public void onNetworkInitializationFinished(@NonNull Class<? extends AdapterConfiguration> clazz, @NonNull MoPubErrorCode moPubErrorCode) {
-                    Log.d(MopubPlugin.PLUGIN_TAG, "AppLovin onNetworkInitializationFinished " + moPubErrorCode);
+                    Log.d(MopubwrapperPlugin.PLUGIN_TAG, "AppLovin onNetworkInitializationFinished " + moPubErrorCode);
                 }
             });
         }
@@ -266,20 +266,20 @@ public class AdManager {
             IronSourceAdapterConfiguration ironSourceAdapterConfiguration = new IronSourceAdapterConfiguration();
             Map<String, String> ironSourceConfiguration = new HashMap<>();
             ironSourceConfiguration.put(AdAdapterValueConstants.applicationKey, adConfiguration.ironSourceApplicationKey);
-            ironSourceAdapterConfiguration.initializeNetwork(MopubPlugin.activity, ironSourceConfiguration, new OnNetworkInitializationFinishedListener() {
+            ironSourceAdapterConfiguration.initializeNetwork(MopubwrapperPlugin.activity, ironSourceConfiguration, new OnNetworkInitializationFinishedListener() {
                 @Override
                 public void onNetworkInitializationFinished(@NonNull Class<? extends AdapterConfiguration> clazz, @NonNull MoPubErrorCode moPubErrorCode) {
-                    Log.d(MopubPlugin.PLUGIN_TAG, "IronSource onNetworkInitializationFinished " + moPubErrorCode);
+                    Log.d(MopubwrapperPlugin.PLUGIN_TAG, "IronSource onNetworkInitializationFinished " + moPubErrorCode);
                 }
             });
         }
 
         if (adConfiguration.isFacebookEnabled()) {
             FacebookAdapterConfiguration facebookAdapterConfiguration = new FacebookAdapterConfiguration();
-            facebookAdapterConfiguration.initializeNetwork(MopubPlugin.activity, null, new OnNetworkInitializationFinishedListener() {
+            facebookAdapterConfiguration.initializeNetwork(MopubwrapperPlugin.activity, null, new OnNetworkInitializationFinishedListener() {
                 @Override
                 public void onNetworkInitializationFinished(@NonNull Class<? extends AdapterConfiguration> clazz, @NonNull MoPubErrorCode moPubErrorCode) {
-                    Log.d(MopubPlugin.PLUGIN_TAG, "Facebook onNetworkInitializationFinished " + moPubErrorCode);
+                    Log.d(MopubwrapperPlugin.PLUGIN_TAG, "Facebook onNetworkInitializationFinished " + moPubErrorCode);
                 }
             });
         }
@@ -288,10 +288,10 @@ public class AdManager {
             Map<String, String> unityConfiguration = new HashMap<>();
             unityConfiguration.put(AdAdapterValueConstants.gameId, adConfiguration.unityGameId);
             UnityAdsAdapterConfiguration unityAdsAdapterConfiguration = new UnityAdsAdapterConfiguration();
-            unityAdsAdapterConfiguration.initializeNetwork(MopubPlugin.activity, unityConfiguration, new OnNetworkInitializationFinishedListener() {
+            unityAdsAdapterConfiguration.initializeNetwork(MopubwrapperPlugin.activity, unityConfiguration, new OnNetworkInitializationFinishedListener() {
                 @Override
                 public void onNetworkInitializationFinished(@NonNull Class<? extends AdapterConfiguration> clazz, @NonNull MoPubErrorCode moPubErrorCode) {
-                    Log.d(MopubPlugin.PLUGIN_TAG, "Unity onNetworkInitializationFinished " + moPubErrorCode);
+                    Log.d(MopubwrapperPlugin.PLUGIN_TAG, "Unity onNetworkInitializationFinished " + moPubErrorCode);
                 }
             });
         }
@@ -303,80 +303,80 @@ public class AdManager {
             @Override
             public void onRewardedVideoLoadSuccess(@NonNull String adUnitId) {
                 adEvents.rewardEvent(RewardAdEvent.LOADED);
-                Log.d(MopubPlugin.PLUGIN_TAG, "MobPub onRewardedVideoLoadSuccess");
+                Log.d(MopubwrapperPlugin.PLUGIN_TAG, "MobPub onRewardedVideoLoadSuccess");
             }
 
             @Override
             public void onRewardedVideoLoadFailure(@NonNull String adUnitId, @NonNull MoPubErrorCode errorCode) {
                 adEvents.rewardEvent(RewardAdEvent.FAILED);
-                Log.d(MopubPlugin.PLUGIN_TAG, "MobPub onRewardedVideoLoadFailure");
+                Log.d(MopubwrapperPlugin.PLUGIN_TAG, "MobPub onRewardedVideoLoadFailure");
             }
 
             @Override
             public void onRewardedVideoStarted(@NonNull String adUnitId) {
                 adEvents.rewardEvent(RewardAdEvent.STARTED);
-                Log.d(MopubPlugin.PLUGIN_TAG, "MobPub onRewardedVideoStarted");
+                Log.d(MopubwrapperPlugin.PLUGIN_TAG, "MobPub onRewardedVideoStarted");
             }
 
             @Override
             public void onRewardedVideoPlaybackError(@NonNull String adUnitId, @NonNull MoPubErrorCode errorCode) {
                 adEvents.rewardEvent(RewardAdEvent.FAILED);
-                Log.d(MopubPlugin.PLUGIN_TAG, "MobPub onRewardedVideoPlaybackError");
+                Log.d(MopubwrapperPlugin.PLUGIN_TAG, "MobPub onRewardedVideoPlaybackError");
             }
 
             @Override
             public void onRewardedVideoClicked(@NonNull String adUnitId) {
                 adEvents.rewardEvent(RewardAdEvent.CLICKED);
-                Log.d(MopubPlugin.PLUGIN_TAG, "MobPub onRewardedVideoClicked");
+                Log.d(MopubwrapperPlugin.PLUGIN_TAG, "MobPub onRewardedVideoClicked");
             }
 
             @Override
             public void onRewardedVideoClosed(@NonNull String adUnitId) {
                 adEvents.rewardEvent(RewardAdEvent.COMPLETED);
                 //Mani - In Android, After closing the first video only second video is getting loaded, So sending completed event to match with iOS.
-                Log.d(MopubPlugin.PLUGIN_TAG, "MobPub onRewardedVideoClosed");
+                Log.d(MopubwrapperPlugin.PLUGIN_TAG, "MobPub onRewardedVideoClosed");
             }
 
             @Override
             public void onRewardedVideoCompleted(@NonNull Set<String> adUnitIds, @NonNull MoPubReward reward) {
                 adEvents.rewardEvent(RewardAdEvent.COMPLETED);
-                Log.d(MopubPlugin.PLUGIN_TAG, "MobPub onRewardedVideoCompleted");
+                Log.d(MopubwrapperPlugin.PLUGIN_TAG, "MobPub onRewardedVideoCompleted");
             }
         });
     }
 
     private void configureInterstitial() {
         //Interstitial
-        mMoPubInterstitial = new MoPubInterstitial(MopubPlugin.activity, adConfiguration.moPubInterstitialId);
+        mMoPubInterstitial = new MoPubInterstitial(MopubwrapperPlugin.activity, adConfiguration.moPubInterstitialId);
         mMoPubInterstitial.setInterstitialAdListener(new MoPubInterstitial.InterstitialAdListener() {
             @Override
             public void onInterstitialLoaded(MoPubInterstitial interstitial) {
                 adEvents.interstitialEvent(InterstitialAdEvent.LOADED);
-                Log.d(MopubPlugin.PLUGIN_TAG, "MobPub onInterstitialLoaded");
+                Log.d(MopubwrapperPlugin.PLUGIN_TAG, "MobPub onInterstitialLoaded");
             }
 
             @Override
             public void onInterstitialFailed(MoPubInterstitial interstitial, MoPubErrorCode errorCode) {
                 adEvents.interstitialEvent(InterstitialAdEvent.FAILED);
-                Log.d(MopubPlugin.PLUGIN_TAG, "MobPub onInterstitialFailed");
+                Log.d(MopubwrapperPlugin.PLUGIN_TAG, "MobPub onInterstitialFailed");
             }
 
             @Override
             public void onInterstitialShown(MoPubInterstitial interstitial) {
                 adEvents.interstitialEvent(InterstitialAdEvent.SHOWED);
-                Log.d(MopubPlugin.PLUGIN_TAG, "MobPub onInterstitialShown");
+                Log.d(MopubwrapperPlugin.PLUGIN_TAG, "MobPub onInterstitialShown");
             }
 
             @Override
             public void onInterstitialClicked(MoPubInterstitial interstitial) {
                 adEvents.interstitialEvent(InterstitialAdEvent.CLICKED);
-                Log.d(MopubPlugin.PLUGIN_TAG, "MobPub onInterstitialClicked");
+                Log.d(MopubwrapperPlugin.PLUGIN_TAG, "MobPub onInterstitialClicked");
             }
 
             @Override
             public void onInterstitialDismissed(MoPubInterstitial interstitial) {
                 adEvents.interstitialEvent(InterstitialAdEvent.DISMISSED);
-                Log.d(MopubPlugin.PLUGIN_TAG, "MobPub onInterstitialDismissed");
+                Log.d(MopubwrapperPlugin.PLUGIN_TAG, "MobPub onInterstitialDismissed");
             }
         });
     }
@@ -384,34 +384,34 @@ public class AdManager {
 
     private void configureBanner() {
         //Banner
-        bannerView = new MoPubView(MopubPlugin.activity);
+        bannerView = new MoPubView(MopubwrapperPlugin.activity);
         bannerView.setAdSize(MoPubView.MoPubAdSize.MATCH_VIEW);
         bannerView.setAdUnitId(adConfiguration.moPubBannerId);
-        bannerView.setBackgroundColor(ContextCompat.getColor(MopubPlugin.activity, android.R.color.transparent));
+        bannerView.setBackgroundColor(ContextCompat.getColor(MopubwrapperPlugin.activity, android.R.color.transparent));
         bannerView.setBannerAdListener(new MoPubView.BannerAdListener() {
             @Override
             public void onBannerLoaded(@NonNull MoPubView banner) {
-                Log.d(MopubPlugin.PLUGIN_TAG, "MobPub onBannerLoaded");
+                Log.d(MopubwrapperPlugin.PLUGIN_TAG, "MobPub onBannerLoaded");
             }
 
             @Override
             public void onBannerFailed(MoPubView banner, MoPubErrorCode errorCode) {
-                Log.d(MopubPlugin.PLUGIN_TAG, "MobPub Banner Loading Failed. Error: " + errorCode);
+                Log.d(MopubwrapperPlugin.PLUGIN_TAG, "MobPub Banner Loading Failed. Error: " + errorCode);
             }
 
             @Override
             public void onBannerClicked(MoPubView banner) {
-                Log.d(MopubPlugin.PLUGIN_TAG, "MobPub onBannerClicked");
+                Log.d(MopubwrapperPlugin.PLUGIN_TAG, "MobPub onBannerClicked");
             }
 
             @Override
             public void onBannerExpanded(MoPubView banner) {
-                Log.d(MopubPlugin.PLUGIN_TAG, "MobPub Banner Expanded");
+                Log.d(MopubwrapperPlugin.PLUGIN_TAG, "MobPub Banner Expanded");
             }
 
             @Override
             public void onBannerCollapsed(MoPubView banner) {
-                Log.d(MopubPlugin.PLUGIN_TAG, "MobPub Banner Collapsed");
+                Log.d(MopubwrapperPlugin.PLUGIN_TAG, "MobPub Banner Collapsed");
             }
         });
     }

@@ -1,4 +1,4 @@
-package com.firekamp.mopub;
+package com.firekamp.mopubwrapper;
 
 public interface AdEvents {
     void interstitialEvent(InterstitialAdEvent event);

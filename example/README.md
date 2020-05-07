@@ -1,6 +1,6 @@
-# mopubad_example
+# mopubwrapper_example
 
-Demonstrates how to use the mopubad plugin.
+Demonstrates how to use the mopubwrapper plugin.
 
 ## Getting Started
 
