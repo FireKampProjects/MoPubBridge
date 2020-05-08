@@ -1,6 +1,6 @@
 library mopub;
 
-export 'package:mopub/models/mopub_data.dart';
-export 'package:mopub/mopub_banner_view.dart';
-export 'package:mopub/ad_manager.dart';
+export 'package:mopubwrapper/models/mopub_data.dart';
+export 'package:mopubwrapper/mopub_banner_view.dart';
+export 'package:mopubwrapper/ad_manager.dart';
 

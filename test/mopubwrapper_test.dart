@@ -1,9 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mopub/ad_manager.dart';
 
 void main() {
-  const MethodChannel channel = MethodChannel('mopubad');
+  const MethodChannel channel = MethodChannel('mopubwrapper');
 
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -16,8 +15,4 @@ void main() {
   tearDown(() {
     channel.setMockMethodCallHandler(null);
   });
-//
-//  test('getPlatformVersion', () async {
-//    expect(await Mopub.platformVersion, '42');
-//  });
 }

@@ -15,7 +15,7 @@ repositories {
     maven { url 'https://maven.google.com' } // necessary for Android API 26
 }
 
-group 'com.firekamp.mopub'
+group 'com.firekamp.mopubwrapper'
 version '1.0'
 
 buildscript {
@@ -44,7 +44,6 @@ android {
     defaultConfig {
         minSdkVersion 16
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        multiDexEnabled true
     }
     lintOptions {
         disable 'InvalidPackage'
@@ -54,7 +53,6 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 }
-
 
 dependencies {
     implementation 'com.android.support:multidex:1.0.3'

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mopub/mopub.dart';
-import 'package:mopub_example/main.dart';
+import 'package:mopubwrapper/mopub.dart';
 
 class SecondPage extends StatefulWidget {
   @override
@@ -24,7 +23,6 @@ class _SecondPageState extends State<SecondPage> {
   @override
   void initState() {
     super.initState();
-    //MoPubAd.fetchAndLoadBanner();
   }
 }
 

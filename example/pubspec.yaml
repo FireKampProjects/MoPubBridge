@@ -1,5 +1,5 @@
-name: mopub_example
-description: Demonstrates how to use the mopubad plugin.
+name: mopubwrapper_example
+description: Demonstrates how to use the mopubwrapper plugin.
 publish_to: 'none'
 
 environment:
@@ -17,7 +17,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  mopub:
+  mopubwrapper:
     path: ../
 
 # For information on the generic Dart part of this file, see the
