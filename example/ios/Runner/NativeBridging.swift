@@ -115,7 +115,7 @@ public class NativeBridging {
     }
 
     func configure(_ call:FlutterMethodCall) -> AdConfiguration?{
-        var adConfiguration : AdConfiguration?
+        var adConfiguration: AdConfiguration?
         guard let arguments: String = call.arguments as? String else {
             assert(false, "Arguments are empty")
             return nil
@@ -148,7 +148,7 @@ public class NativeBridging {
                 
                 let isFacebookEnabled: Bool = json["facebookEnabled"] as? Bool ?? false
                 
-                adConfiguration = AdConfiguration(moPubBannerId: bannerId, moPubInterstitialId: interstitialAdId, moPubRewardId: rewardAdId, adColonyAppId: adColonyAppId, adColonyBannerZoneId: adColonyBannerZoneId, adColonyInterstitialZoneId: adColonyInterstitialZoneId, adColonyRewardedZoneId: adColonyRewardedZoneId, vungleAppId: vungleAppId, ironSourceApplicationKey: ironSourceApplicationKey, appLovinSdkKey: appLovinSdkKey, unityGameId: unityGameId, isFacebookEnabled:isFacebookEnabled)
+                adConfiguration = AdConfiguration(moPubBannerId: bannerId, moPubInterstitialId: interstitialAdId, moPubRewardId: rewardAdId, adColonyAppId: adColonyAppId, adColonyBannerZoneId: adColonyBannerZoneId, adColonyInterstitialZoneId: adColonyInterstitialZoneId, adColonyRewardedZoneId: adColonyRewardedZoneId, vungleAppId: vungleAppId, ironSourceApplicationKey: ironSourceApplicationKey, appLovinSdkKey: appLovinSdkKey, unityGameId: unityGameId, isFacebookEnabled: isFacebookEnabled)
                }
         } catch let error as NSError {
             print(error)

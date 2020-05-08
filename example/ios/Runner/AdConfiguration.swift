@@ -36,18 +36,18 @@ class AdConfiguration
     let isFacebookEnabled: Bool?
     
     
-    init(moPubBannerId : String?,
-         moPubInterstitialId:String?,
-         moPubRewardId:String?,
-         adColonyAppId:String?,
-         adColonyBannerZoneId:String?,
-         adColonyInterstitialZoneId:String?,
-         adColonyRewardedZoneId:String?,
-         vungleAppId:String?,
-         ironSourceApplicationKey:String?,
-         appLovinSdkKey:String?,
-         unityGameId:String?,
-         isFacebookEnabled:Bool){
+    init(moPubBannerId: String?,
+         moPubInterstitialId: String?,
+         moPubRewardId: String?,
+         adColonyAppId: String?,
+         adColonyBannerZoneId: String?,
+         adColonyInterstitialZoneId: String?,
+         adColonyRewardedZoneId: String?,
+         vungleAppId: String?,
+         ironSourceApplicationKey: String?,
+         appLovinSdkKey: String?,
+         unityGameId: String?,
+         isFacebookEnabled: Bool){
         self.moPubBannerId = moPubBannerId
         self.moPubInterstitialId = moPubInterstitialId
         self.moPubRewardId = moPubRewardId

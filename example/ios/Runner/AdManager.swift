@@ -61,7 +61,7 @@ public class AdManager: NSObject {
         return preset
     }
     
-    func configure(_ adConfig:AdConfiguration){
+    func configure(_ adConfig: AdConfiguration){
         self.adConfiguration=adConfig
         if(adConfig.isBannerEnabled()){
             configureBanner(adConfig)
@@ -75,21 +75,21 @@ public class AdManager: NSObject {
         configureThirdPartyNetwork(adConfig)
     }
     
-    func configureBanner(_ adConfig:AdConfiguration){
+    func configureBanner(_ adConfig: AdConfiguration){
         if let bannerId = adConfig.moPubBannerId{
-            bannerView = MPAdView(adUnitId:bannerId)
+            bannerView = MPAdView(adUnitId: bannerId)
             bannerView?.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.size.width, height: self.bannerAdSize.height)
             bannerView?.delegate = self
         }
     }
     
-    func configrueRewardVideo(_ adConfig:AdConfiguration){
+    func configrueRewardVideo(_ adConfig: AdConfiguration){
         if let rewardId = adConfig.moPubRewardId{
             MPRewardedVideo.setDelegate(self, forAdUnitId: rewardId)
         }
     }
     
-    func configureInterstitial(_ adConfig:AdConfiguration){
+    func configureInterstitial(_ adConfig: AdConfiguration){
         if let interstitialId = adConfig.moPubInterstitialId{
             interstitial = MPInterstitialAdController(forAdUnitId: interstitialId)
             interstitial?.delegate = self
@@ -105,17 +105,17 @@ public class AdManager: NSObject {
         }
     }
     
-    func configureThirdPartyNetwork(_ adConfig:AdConfiguration){
+    func configureThirdPartyNetwork(_ adConfig: AdConfiguration){
         
         guard let adId = adConfig.firstValidAdId() else {
                 assert(false, "Altease one type of ad should be configured")
              }
         
         let config = MPMoPubConfiguration(adUnitIdForAppInitialization: adId)
-        let mediaConfigurations:NSMutableDictionary = [:]
+        let mediaConfigurations: NSMutableDictionary = [:]
         
         if(adConfig.isAdColonyEnabled()){
-            let adColonySettings = [AdAdapterValueConstants.appId.rawValue: adConfig.adColonyAppId ?? "",AdAdapterValueConstants.allZoneIds.rawValue:adConfig.getZoneIds()] as [String : Any]
+            let adColonySettings = [AdAdapterValueConstants.appId.rawValue: adConfig.adColonyAppId ?? "",AdAdapterValueConstants.allZoneIds.rawValue: adConfig.getZoneIds()] as [String : Any]
             mediaConfigurations[AdAdapterConstants.adColony.rawValue] = adColonySettings
         }
         
@@ -125,7 +125,7 @@ public class AdManager: NSObject {
         }
         
         if(adConfig.isIronSourceEnabled()){
-            let ironsourceSettings = [AdAdapterValueConstants.applicationKey.rawValue:adConfig.ironSourceApplicationKey]
+            let ironsourceSettings = [AdAdapterValueConstants.applicationKey.rawValue: adConfig.ironSourceApplicationKey]
             mediaConfigurations[AdAdapterConstants.ironSource.rawValue] = ironsourceSettings
         }
         
