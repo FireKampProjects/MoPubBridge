@@ -61,7 +61,7 @@ public class AdManager: NSObject {
         return preset
     }
     
-    func configure(adConfig:AdConfiguration){
+    func configure(_ adConfig:AdConfiguration){
         self.adConfiguration=adConfig
         if(adConfig.isBannerEnabled()){
             configureBanner(adConfig)
@@ -76,18 +76,24 @@ public class AdManager: NSObject {
     }
     
     func configureBanner(_ adConfig:AdConfiguration){
-        bannerView = MPAdView(adUnitId:adConfig.moPubBannerId)
-        bannerView?.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.size.width, height: self.bannerAdSize.height)
-        bannerView?.delegate = self
+        if let bannerId = adConfig.moPubBannerId{
+            bannerView = MPAdView(adUnitId:bannerId)
+            bannerView?.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.size.width, height: self.bannerAdSize.height)
+            bannerView?.delegate = self
+        }
     }
     
     func configrueRewardVideo(_ adConfig:AdConfiguration){
-        MPRewardedVideo.setDelegate(self, forAdUnitId: adConfig.moPubRewardId)
+        if let rewardId = adConfig.moPubRewardId{
+            MPRewardedVideo.setDelegate(self, forAdUnitId: rewardId)
+        }
     }
     
     func configureInterstitial(_ adConfig:AdConfiguration){
-        interstitial = MPInterstitialAdController(forAdUnitId: adConfig.moPubInterstitialId)
-        interstitial?.delegate = self
+        if let interstitialId = adConfig.moPubInterstitialId{
+            interstitial = MPInterstitialAdController(forAdUnitId: interstitialId)
+            interstitial?.delegate = self
+        }
     }
     
     func fetchAndLoadBanner() {
@@ -99,8 +105,13 @@ public class AdManager: NSObject {
         }
     }
     
-    func configureThirdPartyNetwork(_ adConfig : AdConfiguration){
-        let config = MPMoPubConfiguration(adUnitIdForAppInitialization: adConfig.firstValidAdId())
+    func configureThirdPartyNetwork(_ adConfig:AdConfiguration){
+        
+        guard let adId = adConfig.firstValidAdId() else {
+                assert(false, "Altease one type of ad should be configured")
+             }
+        
+        let config = MPMoPubConfiguration(adUnitIdForAppInitialization: adId)
         let mediaConfigurations:NSMutableDictionary = [:]
         
         if(adConfig.isAdColonyEnabled()){
@@ -132,9 +143,9 @@ public class AdManager: NSObject {
         
     }
     func hideBannerAd() {
-        if let banner = bannerView, let adconfig = adConfiguration, adconfig.isBannerEnabled() {
-            banner.stopAutomaticallyRefreshingContents()
-            banner.removeFromSuperview()
+        if let adconfig = adConfiguration, adconfig.isBannerEnabled() {
+            bannerView?.stopAutomaticallyRefreshingContents()
+            bannerView?.removeFromSuperview()
         }
         else
         {
@@ -143,7 +154,7 @@ public class AdManager: NSObject {
     }
     
     func showBannerAd() {
-        if let banner = bannerView, let adconfig = adConfiguration, adconfig.isBannerEnabled() {
+        if let banner = bannerView, let adConfig = adConfiguration, adConfig.isBannerEnabled() {
             addBannerViewToView(banner)
         }
         else{
@@ -214,7 +225,7 @@ extension AdManager: MPAdViewDelegate {
     
     public func adViewDidLoadAd(_ view: MPAdView!, adSize: CGSize) {
         print("banner did load for id: \(view.adUnitId)")
-        if let banner=bannerView{
+        if let banner = bannerView{
             addBannerViewToView(banner)
         }
     }

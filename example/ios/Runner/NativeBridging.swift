@@ -86,7 +86,7 @@ public class NativeBridging {
         if methodCall == BridgeMethods.configure.rawValue {
             let adConfiguration=configure(call)
             if let adconfig=adConfiguration{
-              adManager.configure(adConfig :adconfig)
+              adManager.configure(adconfig)
             }
             result(nil)
         }

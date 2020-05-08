@@ -36,7 +36,7 @@ class AdConfiguration
     let isFacebookEnabled: Bool?
     
     
-    init(moPubBannerId:String?,
+    init(moPubBannerId : String?,
          moPubInterstitialId:String?,
          moPubRewardId:String?,
          adColonyAppId:String?,
@@ -63,7 +63,7 @@ class AdConfiguration
     }
     
     
-    func firstValidAdId() -> String!{
+    func firstValidAdId() -> String?{
         if (isBannerEnabled()) {
             return moPubBannerId;
         }
@@ -111,7 +111,7 @@ class AdConfiguration
     func getZoneIds() -> [String]{
         var zoneIds:[String]=[]
         if let bannerId = adColonyBannerZoneId, !bannerId.isEmpty {
-            zoneIds.append(adColonyBannerZoneId!)
+            zoneIds.append(bannerId)
         }
         if let interstitialId = adColonyBannerZoneId, !interstitialId.isEmpty {
             zoneIds.append(interstitialId)
