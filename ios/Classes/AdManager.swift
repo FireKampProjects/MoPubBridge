@@ -63,6 +63,8 @@ public class AdManager: NSObject {
     
     func configure(_ adConfig: AdConfiguration){
         self.adConfiguration=adConfig
+        //TODO: Need to check with kamran, is this correct way to get the rootview controller. Is there any changes of detaching the viewcontroller like in Android.
+        rootViewController = UIApplication.shared.keyWindow?.rootViewController
         if(adConfig.isBannerEnabled()){
             configureBanner(adConfig)
         }
