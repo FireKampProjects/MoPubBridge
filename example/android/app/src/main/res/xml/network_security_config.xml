@@ -5,9 +5,4 @@
         <certificates src="system"/>
     </trust-anchors>
 </base-config>
-<domain-config cleartextTrafficPermitted="false">
-    <domain includeSubdomains="true">example.com</domain>
-    <domain includeSubdomains="true">cdn.example2.com</domain>
-    <domain includeSubdomains="true">127.0.0.1</domain>
-</domain-config>
 </network-security-config>

@@ -1,3 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
   package="com.firekamp.mopubwrapper">
+    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!--For AdColony-->
+    <uses-permission android:name="android.permission.VIBRATE" /> <!--For AdColony-->
 </manifest>
