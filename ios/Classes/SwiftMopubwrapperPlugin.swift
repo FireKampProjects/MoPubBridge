@@ -39,7 +39,7 @@ public class SwiftMopubwrapperPlugin: NSObject, FlutterPlugin {
                                     BridgeMethods.showRewardAd.rawValue,
                                     BridgeMethods.resumeBannerRefresh.rawValue,
                                     BridgeMethods.stopBannerRefresh.rawValue]
-    //TODO: Need to check with Kamran, better way to handle this.
+    
     private static var adManager: AdManager = AdManager()
     
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -68,8 +68,8 @@ public class SwiftMopubwrapperPlugin: NSObject, FlutterPlugin {
         }
         
         if methodCall == BridgeMethods.configure.rawValue {
-            let adConfiguration=configure(call)
-            if let adconfig=adConfiguration{
+            let adConfiguration = configure(call)
+            if let adconfig = adConfiguration{
                 SwiftMopubwrapperPlugin.adManager.configure(adconfig)
             }
             result(nil)

@@ -1,18 +1,3 @@
-allprojects {
-    repositories {
-        maven {
-            name "Tapjoy's maven repo"
-            url "https://tapjoy.bintray.com/maven"
-        }
-        maven {
-            url "https://adcolony.bintray.com/AdColony"
-        }
-        maven { url 'https://jitpack.io' }  // For Vungle
-        maven { url "https://dl.bintray.com/ironsource-mobile/android-sdk" } // For IronSource
-        maven { url "https://s3.amazonaws.com/moat-sdk-builds" }
-        maven { url 'https://maven.google.com' } // necessary for Android API 26
-    }
-}
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
