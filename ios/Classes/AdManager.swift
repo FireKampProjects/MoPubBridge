@@ -63,6 +63,11 @@ public class AdManager: NSObject {
     
     func configure(_ adConfig: AdConfiguration){
         self.adConfiguration=adConfig
+        rootViewController = UIApplication.shared.keyWindow?.rootViewController
+        guard let rootViewController = UIApplication.shared.keyWindow?.rootViewController else {
+            assert(false, "rooteViewController is null")
+            return
+        }
         if(adConfig.isBannerEnabled()){
             configureBanner(adConfig)
         }

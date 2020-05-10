@@ -7,12 +7,16 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
+import com.adcolony.sdk.AdColony;
+import com.adcolony.sdk.AdColonyAppOptions;
 import com.mopub.common.AdapterConfiguration;
 import com.mopub.common.MoPub;
 import com.mopub.common.MoPubReward;
 import com.mopub.common.OnNetworkInitializationFinishedListener;
 import com.mopub.common.SdkConfiguration;
 import com.mopub.common.SdkInitializationListener;
+import com.mopub.common.privacy.PersonalInfoManager;
+import com.mopub.common.util.Json;
 import com.mopub.mobileads.AdColonyAdapterConfiguration;
 import com.mopub.mobileads.AppLovinAdapterConfiguration;
 import com.mopub.mobileads.FacebookAdapterConfiguration;
@@ -194,9 +198,15 @@ public class AdManager {
         try {
             this.adConfiguration = configuration;
             adEvents = adEventsCallBack;
-            MoPub.initializeSdk(MopubwrapperPlugin.activity, new SdkConfiguration.Builder(adConfiguration.firstValidAdId()).build(), new SdkInitializationListener() {
+            SdkConfiguration.Builder builder = new SdkConfiguration.Builder(adConfiguration.firstValidAdId());
+            //builder.withLegitimateInterestAllowed(true); //TODO: Need to uncomment this. Once more researches have been about GDPR
+            MoPub.initializeSdk(MopubwrapperPlugin.activity, builder.build(), new SdkInitializationListener() {
                 @Override
                 public void onInitializationFinished() {
+                    //TODO: Need to uncomment this. Once more researches have been about GDPR
+                    //PersonalInfoManager mPersonalInfoManager = MoPub.getPersonalInformationManager();
+                    //mPersonalInfoManager.forceGdprApplies();
+                    configureThirdPartyNetworks();
                     Log.d(MopubwrapperPlugin.PLUGIN_TAG, "SDK initialization Finished");
                 }
             });
@@ -212,9 +222,6 @@ public class AdManager {
             if (adConfiguration.isRewardEnabled()) {
                 configureReward();
             }
-
-            configureThirdPartyNetworks();
-
         } catch (Exception e) {
             Log.e(MopubwrapperPlugin.PLUGIN_TAG, "configure" + e.getMessage());
         }
