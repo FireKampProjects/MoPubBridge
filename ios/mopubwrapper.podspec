@@ -4,18 +4,18 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'mopubwrapper'
-  s.version          = '0.0.1'
+  s.version          = '0.0.3'
   s.summary          = 'A new Flutter plugin.'
   s.description      = <<-DESC
 A new Flutter plugin.
                        DESC
-  s.homepage         = 'http://example.com'
-  s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
-  s.source           = { :path => '.' }
+  s.homepage         = 'https://github.com/manikandan-selvanathan/MoPubBridge.git'
+  s.license          = 'MIT'
+  s.author           = { 'Manikandan Selvanathan' => 'manikandan.selvanathan.ca@gmail.com' }
+  s.source       = { :git => 'https://github.com/manikandan-selvanathan/MoPubBridge', :branch => 'master' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'mopub-ios-sdk'
+  s.dependency 'mopub-ios-sdk/Core'
   s.dependency 'MoPub-UnityAds-Adapters'
   s.dependency 'MoPub-IronSource-Adapters'
   s.dependency 'MoPub-Vungle-Adapters'

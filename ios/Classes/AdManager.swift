@@ -113,7 +113,8 @@ public class AdManager: NSObject {
     func configureThirdPartyNetwork(_ adConfig: AdConfiguration){
         
         guard let adId = adConfig.firstValidAdId() else {
-                assert(false, "Altease one type of ad should be configured")
+                assert(false, "Atleast one type of ad should be configured")
+                return
              }
         
         let config = MPMoPubConfiguration(adUnitIdForAppInitialization: adId)
